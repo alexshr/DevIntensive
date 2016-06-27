@@ -1,11 +1,77 @@
 <resources>
 
+
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="colorAccent">@color/color_accent</item>
+
+        <!-- Remove EditText bottom line in disabled mode -->
+        <item name="colorControlNormal">@android:color/white</item>
+    </style>
+
+    <style name="icon">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/spacing_medium_24</item>
+    </style>
+
+    <style name="icon.left">
+        <item name="android:layout_gravity">top|left</item>
+        <item name="android:layout_marginLeft">@dimen/spacing_normal_16</item>
+    </style>
+
+    <style name="icon.right">
+        <item name="android:layout_gravity">top|right</item>
+        <item name="android:layout_marginRight">@dimen/spacing_medium_32</item>
+    </style>
+
+    <!-- Contacts page header -->
+    <style name="header_text">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textColor">@android:color/white</item>
+
+    </style>
+
+    <!-- Contacts page header -->
+    <style name="header_text.large">
+        <item name="android:textSize">@dimen/font_size_24</item>
+    </style>
+
+    <!-- Contacts page outer LinearLayout -->
+    <style name="outer_layout">
+        <item name="android:layout_marginBottom">@dimen/spacing_small_8</item>
+        <item name="android:layout_marginTop">@dimen/spacing_small_8</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+    <!-- Contacts page inner LinearLayout style -->
+    <style name="inner_layout">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">@dimen/size_large_72</item>
+        <item name="android:layout_marginLeft">@dimen/spacing_medium_32</item>
+        <item name="android:layout_marginRight">@dimen/spacing_normal_16</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">bottom</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <!-- Contacts page TextEdit elements style -->
+    <style name="text_edit">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:enabled">false</item>
+        <item name="android:focusable">false</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColorHint">@color/grey</item>
+        <item name="android:textSize">@dimen/font_size_15</item>
+
     </style>
 
 </resources>
