@@ -4,16 +4,19 @@
         <dimen name="activity_vertical_margin">16dp</dimen>
 
         <!-- Font sizes -->
-        <dimen name="font_size_34">34sp</dimen>
+
         <dimen name="font_size_24">24sp</dimen>
-        <dimen name="font_size_15">15sp</dimen>
-        <dimen name="font_size_13">13sp</dimen>
+
+        <dimen name="text_size_user_rating_value">24sp</dimen>
+        <dimen name="text_size_user_rating_caption">14sp</dimen>
+
 
         <!-- Spaces -->
         <dimen name="spacing_larger_72">72dp</dimen>
         <dimen name="spacing_large_56">56dp</dimen>
         <dimen name="spacing_medium_48">48dp</dimen>
         <dimen name="spacing_medium_32">32dp</dimen>
+        <dimen name="spacing_medium_28">24dp</dimen>
         <dimen name="spacing_medium_24">24dp</dimen>
         <dimen name="spacing_normal_16">16dp</dimen>
         <dimen name="spacing_small_8">8dp</dimen>
@@ -26,6 +29,8 @@
         <dimen name="size_small_24">24dp</dimen>
 
         <dimen name="line_size">1dp</dimen>
+        <dimen name="profile_image_size">256dp</dimen>
+        <dimen name="fab_right_space">8dp</dimen>
 
 
 </resources>
