@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+    <LinearLayout style="@style/outer_layout">
+
+        <ImageView
+            style="@style/icon.left"
+            android:src="@drawable/ic_call_black_24dp"/>
+
+        <LinearLayout style="@style/inner_layout">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/phone_edit"
+                    style="@style/text_edit"
+                    android:hint="@string/contacts_mobile"
+                    android:inputType="phone"
+                    android:text="@string/contacts_mobile_vol"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/call_img"
+            style="@style/icon.right"
+            android:src="@drawable/ic_phone_in_talk_black_24dp"/>
+
+    </LinearLayout>
+
+    <View style="@style/divider"/>
+
+    <LinearLayout style="@style/outer_layout">
+
+        <ImageView
+            style="@style/icon.left"
+            android:src="@drawable/ic_mail_black_24dp"/>
+
+        <LinearLayout style="@style/inner_layout">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/email_edit"
+                    style="@style/text_edit"
+                    android:hint="@string/contacts_email"
+                    android:inputType="textEmailAddress"
+                    android:text="@string/contacts_email_vol"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            style="@style/icon.right"
+            android:src="@drawable/ic_send_black_24dp"/>
+
+    </LinearLayout>
+
+    <View style="@style/divider"/>
+
+    <LinearLayout style="@style/outer_layout">
+
+        <ImageView
+            style="@style/icon.left"
+            android:src="@drawable/ic_vk"/>
+
+        <LinearLayout style="@style/inner_layout">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/vk_profile_edit"
+                    style="@style/text_edit"
+                    android:hint="@string/contacts_vk"
+                    android:inputType="textUri"
+                    android:text="@string/contacts_vk_vol"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            style="@style/icon.right"
+            android:src="@drawable/ic_visibility_black_24dp"/>
+
+    </LinearLayout>
+
+    <View style="@style/divider"/>
+
+    <LinearLayout style="@style/outer_layout">
+
+        <ImageView
+            style="@style/icon.left"
+            android:src="@drawable/ic_git_circle_24dp"/>
+
+        <LinearLayout style="@style/inner_layout">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/repo_edit"
+                    style="@style/text_edit"
+                    android:hint="@string/contacts_repo"
+                    android:inputType="textUri"
+                    android:text="@string/contacts_repo_vol"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            style="@style/icon.right"
+            android:src="@drawable/ic_visibility_black_24dp"/>
+
+    </LinearLayout>
+
+    <View style="@style/divider"/>
+
+    <LinearLayout style="@style/outer_layout">
+
+        <ImageView
+            style="@style/icon.left"
+            android:src="@drawable/ic_account_circle_black_24dp"/>
+
+        <LinearLayout
+            style="@style/inner_layout"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/spacing_normal_16">
+
+                <EditText
+                    android:id="@+id/about_edit"
+                    style="@style/text_edit"
+                    android:hint="@string/contacts_about"
+                    android:inputType="textMultiLine|textAutoCorrect|textCapSentences"
+                    android:text="@string/contacts_about_vol"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
