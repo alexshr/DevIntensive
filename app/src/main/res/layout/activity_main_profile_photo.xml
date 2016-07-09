@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/profile_image_size"
+    android:fitsSystemWindows="true"
+    tools:ignore="contentDescription">
+
+    <ImageView
+        android:id="@+id/user_photo_img"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/profile_image_size"
+        android:background="@color/user_photo_bgr"
+        android:scaleType="centerCrop"
+        />
+
+    <RelativeLayout
+        android:id="@+id/placeholder_profilePhoto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <TextView
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/placeholder_profilePhoto_img"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/spacing_small_8"
+            android:gravity="center"
+
+            android:shadowColor="@android:color/black"
+            android:shadowDx="@integer/photo_placeholder_shadow_x"
+            android:shadowDy="@integer/photo_placeholder_shadow_y"
+            android:shadowRadius="@integer/photo_placeholder_shadow_radius"
+
+            android:fontFamily="@string/font_medium"
+            android:textColor="@color/white"
+            android:textSize="@dimen/change_photo_text_size"
+            android:text="@string/change_profile_photo"/>
+
+        <ImageView
+            android:id="@+id/placeholder_profilePhoto_img"
+            android:layout_width="@dimen/photo_placeholder_size"
+            android:layout_height="@dimen/photo_placeholder_size"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="@dimen/spacing_large_56"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_add_a_photo_24"
+            />
+    </RelativeLayout>
+
+</merge>

@@ -7,8 +7,7 @@
 
         <dimen name="font_size_24">24sp</dimen>
 
-        <dimen name="text_size_user_rating_value">24sp</dimen>
-        <dimen name="text_size_user_rating_caption">14sp</dimen>
+
 
 
         <!-- Spaces -->
@@ -31,6 +30,27 @@
         <dimen name="line_size">1dp</dimen>
         <dimen name="profile_image_size">256dp</dimen>
         <dimen name="fab_right_space">8dp</dimen>
+
+        <dimen name="auth_layout_padding">28dp</dimen>
+
+        <dimen name="auth_screen_padding_h">72dp</dimen>
+
+
+        <dimen name="auth_textinputlayout_margin_top">16dp</dimen>
+
+        <dimen name="auth_btn_width">128dp</dimen>
+        <dimen name="auth_btn_height">36dp</dimen>
+
+        <dimen name="auth_inset_height">24dp</dimen>
+        <dimen name="auth_inset_width">4dp</dimen>
+        <dimen name="auth_btn_margin_top">28dp</dimen>
+
+
+        <dimen name="auth_btn_margin_bottom">12dp</dimen>
+
+
+
+        <dimen name="photo_placeholder_size">90dp</dimen>
 
 
 </resources>

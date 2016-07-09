@@ -3,7 +3,7 @@
     android:id="@+id/user_ratings"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/grey"
+    android:background="@color/user_rating_bgr"
 
     android:orientation="horizontal"
     android:paddingBottom="@dimen/spacing_medium_28"
@@ -14,54 +14,69 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/size_medium_56"
         android:layout_weight="0.25"
+        android:gravity="center"
         android:orientation="vertical">
 
         <TextView
-            style="@style/user_rating.value"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textAppearance="@style/user_rating_textAppearance"
             android:text="@string/header_rating_vol"/>
 
         <TextView
-            style="@style/user_rating.caption"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textAppearance="@style/user_rating_textAppearance.caption"
             android:text="@string/header_rating"/>
     </LinearLayout>
 
     <View
         android:layout_width="@dimen/line_size"
         android:layout_height="@dimen/size_medium_56"
-        android:background="@color/grey_light"/>
+        android:background="@color/user_rating_divider"/>
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="@dimen/size_medium_56"
         android:layout_weight="0.5"
+        android:gravity="center"
         android:orientation="vertical">
 
         <TextView
-            style="@style/user_rating.value"
-            android:text="@string/header_code_strings_vol"/>
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/header_code_strings_vol"
+            android:textAppearance="@style/user_rating_textAppearance"/>
 
         <TextView
-            style="@style/user_rating.caption"
-            android:text="@string/header_code_strings"/>
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/header_code_strings"
+            android:textAppearance="@style/user_rating_textAppearance.caption"/>
     </LinearLayout>
 
     <View
         android:layout_width="@dimen/line_size"
         android:layout_height="@dimen/size_medium_56"
-        android:background="@color/grey_light"/>
+        android:background="@color/user_rating_divider"/>
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="@dimen/size_medium_56"
         android:layout_weight="0.25"
+        android:gravity="center"
         android:orientation="vertical">
 
         <TextView
-            style="@style/user_rating.value"
-            android:text="@string/header_projects_vol"/>
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/header_projects_vol"
+            android:textAppearance="@style/user_rating_textAppearance"/>
 
         <TextView
-            style="@style/user_rating.caption"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textAppearance="@style/user_rating_textAppearance.caption"
             android:text="@string/header_projects"/>
     </LinearLayout>
 

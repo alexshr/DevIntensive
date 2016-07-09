@@ -1,6 +1,7 @@
 package com.softdesign.devintensive.data.managers;
 
 import android.content.SharedPreferences;
+import android.net.Uri;
 
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.DevApplication;
@@ -35,8 +36,21 @@ public class PreferencesManager {
     public List<String> loadUserProfileData() {
         List<String> userFields = new ArrayList<>();
         for (String userFieldKey : USER_FIELDS) {
-            userFields.add(mSharedPreferences.getString(userFieldKey, "null"));
+            userFields.add(mSharedPreferences.getString(userFieldKey,""));
         }
         return userFields;
+    }
+
+    public void saveUserPhoto(Uri uri) {
+        if (uri != null) {
+            SharedPreferences.Editor editor = mSharedPreferences.edit();
+            editor.putString(ConstantManager.USER_PROFILE_PHOTO_URI, uri.toString());
+            editor.apply();
+        }
+    }
+
+    public Uri loadUserPhoto() {
+        return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_PROFILE_PHOTO_URI,
+                ""));
     }
 }

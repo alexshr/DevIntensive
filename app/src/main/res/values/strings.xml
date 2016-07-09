@@ -9,7 +9,7 @@
     <string name="contacts_mobile">Мобильный</string>
     <string name="contacts_email">E-mail</string>
     <string name="contacts_vk">Профиль в VK</string>
-    <string name="contacts_repo">Репозиторий</string>
+    <string name="contacts_repo">Профиль в github</string>
     <string name="contacts_about">О себе</string>
 
 
@@ -32,4 +32,39 @@
         Nulla quam velit, vulputate eu pharetra nec, mattis ac neque. Duis vulputate commodo
         lectus, ac blandit elit.
     </string>
+
+    <string name="change_profile_photo">Изменить фотографию профиля</string>
+
+
+
+
+    <string name="auth_enter">Войти</string>
+    <string name="auth_email">E-mail</string>
+    <string name="auth_pass">Пароль</string>
+
+    <string name="auth_email_default">test@test.ru</string>
+    <string name="auth_pass_default">test</string>
+
+    <string name="allow">Разрешить</string>
+    <string name="hint.choosePhoto">Выберите фотографию</string>
+
+    <string name="auth_forgotten_pass">Забыли пароль?</string>
+
+    <string name="error_permissions_needed">Для корректной работы приложения необходимо дать
+        требуемые разрешения
+    </string>
+
+    <string name="hint_input_phone">введите \'+\' и 11-20 цифр</string>
+    <string name="hint_input_vk">введите vk.com/*</string>
+    <string name="hint_input_github">введите github.com/*</string>
+    <string name="hint_input_mail">Введите email</string>
+
+
+    <string-array name="profile_placeHolder_loadPhotoDialog">
+        <item>Сделать снимок</item>
+        <item>Выбрать из галереи</item>
+        <item>Отмена</item>
+    </string-array>
+
+
 </resources>
