@@ -58,6 +58,7 @@
     <string name="hint_input_vk">введите vk.com/*</string>
     <string name="hint_input_github">введите github.com/*</string>
     <string name="hint_input_mail">Введите email</string>
+    <string name="logout">Выйти</string>
 
 
     <string-array name="profile_placeHolder_loadPhotoDialog">

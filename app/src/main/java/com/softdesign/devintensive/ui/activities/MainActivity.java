@@ -569,8 +569,15 @@ public class MainActivity extends BaseActivity {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
-                showSnackBar(item.getTitle().toString());
-                item.setChecked(true);
+                switch(item.getItemId()){
+                    case R.id.logout:
+                        logout();
+                        break;
+                    default:
+                        showSnackBar(item.getTitle().toString());
+                        item.setChecked(true);
+                }
+
                 mNavigationDrawer.closeDrawer(GravityCompat.START);
                 return false;
             }
@@ -624,6 +631,10 @@ public class MainActivity extends BaseActivity {
         }
         mDataManager.getPreferencesManager().saveUserProfileData(userData);
 
+    }
+
+    private void logout() {
+        startActivity(new Intent(this, LoginActivity.class));
     }
 
 
