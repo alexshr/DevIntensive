@@ -1,4 +1,5 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources xmlns:app="http://schemas.android.com/apk/res-auto"
+           xmlns:tools="http://schemas.android.com/tools">
 
 
     <!-- Base application theme. -->
@@ -13,39 +14,38 @@
     </style>
 
 
-    <style name="icon">
+    <!--user_rating-->
+    <style name="user_info_icon">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">@dimen/spacing_medium_24</item>
     </style>
 
-    <style name="icon.left">
+    <style name="user_info_icon.left">
         <item name="android:layout_gravity">top|left</item>
         <item name="android:layout_marginLeft">@dimen/spacing_normal_16</item>
     </style>
 
-    <style name="icon.right">
+    <style name="user_info_icon.right">
         <item name="android:layout_gravity">top|right</item>
         <item name="android:layout_marginRight">@dimen/spacing_medium_32</item>
     </style>
 
-    <!-- Contacts page header -->
-    <style name="user_rating">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:gravity">center</item>
-        <item name="android:textColor">@android:color/white</item>
+    <style name="user_rating_textAppearance">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/user_rating_value_text_size</item>
     </style>
 
-    <style name="user_rating.value">
-        <item name="android:textSize">@dimen/text_size_user_rating_value</item>
+    <style name="user_rating_textAppearance.caption">
+        <item name="android:textSize">@dimen/user_rating_caption_text_size</item>
     </style>
 
-    <style name="user_rating.caption">
-        <item name="android:textSize">@dimen/text_size_user_rating_caption</item>
+    <style name="textInputLayout_error" parent="TextAppearance.Design.Hint">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textSize">13sp</item>
     </style>
 
-    <!-- Contacts page outer LinearLayout -->
+    <!-- user_info -->
     <style name="outer_layout">
         <item name="android:layout_marginBottom">@dimen/spacing_small_8</item>
         <item name="android:layout_marginTop">@dimen/spacing_small_8</item>
@@ -54,23 +54,17 @@
         <item name="android:orientation">horizontal</item>
     </style>
 
-    <!-- Contacts page inner LinearLayout style -->
+
     <style name="inner_layout">
         <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">@dimen/size_large_72</item>
+        <item name="android:layout_height">wrap_content</item>
+
         <item name="android:layout_marginLeft">@dimen/spacing_medium_32</item>
         <item name="android:layout_marginRight">@dimen/spacing_normal_16</item>
         <item name="android:layout_weight">1</item>
         <item name="android:gravity">bottom</item>
         <item name="android:orientation">vertical</item>
     </style>
-
-    <!-- Contacts page TextEdit elements style -->
-    <style name="text_edit">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
 
     <style name="divider">
         <item name="android:layout_width">match_parent</item>
@@ -83,15 +77,26 @@
     <!--drawer header-->
 
     <style name="drawer_header">
-        <item name="android:textColor">@android:color/white</item>
-
+        <item name="android:textColor">@color/white</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
 
-    <!--
-TODO req sdk 16+
--->
+
+   <!--activity_auth-->
+
+    <style name="auth_hint_textappearance" parent="TextAppearance.Design.Hint">
+        <item name="android:textSize">@dimen/auth_hint_text_size</item>
+        <item name="android:textColor">@color/auth_textinputlayout_hint</item>
+        <item name="android:fontFamily" tools:targetApi="jelly_bean">@string/font_condensed</item>
+    </style>
+
+    <style name="auth_edit_textappearance">
+        <item name="android:textColor">@color/auth_edittext</item>
+        <item name="android:textSize">@dimen/auth_edit_text_size</item>
+        <item name="android:fontFamily" tools:targetApi="jelly_bean">@string/font_condensed</item>
+    </style>
+
     <style name="drawer_header.user_name" parent="drawer_header">
         <item name="android:fontFamily" tools:targetApi="jelly_bean">sans-serif</item>
     </style>
@@ -99,5 +104,6 @@ TODO req sdk 16+
     <style name="drawer_header.email" parent="drawer_header">
         <item name="android:fontFamily" tools:targetApi="jelly_bean">sans-serif-condensed</item>
     </style>
+
 
 </resources>

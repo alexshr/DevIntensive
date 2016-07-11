@@ -6,8 +6,26 @@
     <color name="color_primary_dark">#303F9F</color>
     <color name="color_accent">#FF4081</color>
 
+    <color name="white">#f9f9f9</color>
+
+
 
     <color name="grey">#5d5d5d</color>
     <color name="grey_light">#d3d3d3</color>
+
+    <color name="user_rating_divider">#696969</color>
+    <color name="user_rating_bgr">#595959</color>
+
+    <color name="auth_text_enter">#e44d3c</color>
+
+    <color name="auth_textinputlayout_hint">#bfbfbf</color>
+    <color name="auth_edittext">#3e3e3e</color>
+    <color name="auth_btn">#e74b3c</color>
+    <color name="auth_inset_red">#e44d3c</color>
+
+
+    <color name="restore_pass_text">#bfbfbf</color>
+
+    <color name="user_photo_bgr">#454545</color>
 
 </resources>
