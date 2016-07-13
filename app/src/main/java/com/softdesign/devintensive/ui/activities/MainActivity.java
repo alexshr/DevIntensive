@@ -135,7 +135,6 @@ public class MainActivity extends BaseActivity {
     private Uri mPhotoUri = null;
 
 
-
     @OnClick({R.id.call_img, R.id.fab, R.id.placeholder_layout, R.id.email_img, R.id.vk_img, R.id.repo_img})
     public void onClick(View v) {
         switch (v.getId()) {
@@ -519,6 +518,15 @@ public class MainActivity extends BaseActivity {
                 .placeholder(R.drawable.user_avatar)
                 .transform(new PicassoRoundTransform())
                 .into(userAvatarImg);
+
+        //show user name and email
+        TextView userNameView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_name);
+        String userName=mDataManager.getPreferencesManager().getUserName();
+        userNameView.setText(userName);
+
+        TextView userEmailView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_email);
+        String email=mDataManager.getPreferencesManager().getEmail();
+        userEmailView.setText(email);
 
         /*
         Bitmap avatar = BitmapFactory.decodeResource(getResources(), R.drawable.user_avatar);

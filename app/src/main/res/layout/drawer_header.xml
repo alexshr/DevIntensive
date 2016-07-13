@@ -37,14 +37,14 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/user_name_txt"
+            android:id="@+id/user_name"
             style="@style/drawer_header.user_name"
-            android:text="@string/app_name"/>
+            />
 
         <TextView
-            android:id="@+id/user_email_txt"
+            android:id="@+id/user_email"
             style="@style/drawer_header.email"
-            android:text="@string/contacts_email_vol"/>
+            />
     </LinearLayout>
 
 </RelativeLayout>

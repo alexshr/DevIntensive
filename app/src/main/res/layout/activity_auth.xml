@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
                 android:textAppearance="@style/auth_edit_textappearance"
-                android:text="@string/auth_email_default"
+
                 />
         </android.support.design.widget.TextInputLayout>
 
@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
                 android:textAppearance="@style/auth_edit_textappearance"
-                android:text="@string/auth_pass_default"
+
                 />
         </android.support.design.widget.TextInputLayout>
 

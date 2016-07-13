@@ -44,6 +44,17 @@ public class PreferencesManager {
         editor.apply();
     }
 
+
+    public String getUserName() {
+
+        String firstName=mSharedPreferences.getString(ConstantManager.USER_FIRST_NAME, " ");
+        String secondName=mSharedPreferences.getString(ConstantManager.USER_SECOND_NAME, " ");
+        return secondName+" "+firstName;
+    }
+
+
+
+    //to login automatically
     public void saveLogin(String login){
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString(ConstantManager.USER_LOGIN,login);
@@ -60,6 +71,10 @@ public class PreferencesManager {
 
     public String getPassword() {
         return mSharedPreferences.getString(ConstantManager.USER_PASS,"");
+    }
+
+    public String getEmail() {
+        return mSharedPreferences.getString(ConstantManager.USER_MAIL_KEY,"");
     }
 
     /**
@@ -127,6 +142,9 @@ public class PreferencesManager {
             editor.apply();
         }
     }
+
+
+
 
     public Uri getPhotoLocalUri() {
         return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_PHOTO_LOCAL_URI,
