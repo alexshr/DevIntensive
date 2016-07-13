@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="regexp_phone">^[+][0-9]{11,20}$</string>
+    <string name="regexp_vk">^(vk.com/)[a-zA-Z0-9-]+$</string>
+    <string name="regexp_github">^(github.com/)[a-zA-Z0-9-]+$</string>
+    <string name="regexp_email">^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$</string>
+
+</resources>

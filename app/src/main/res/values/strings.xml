@@ -59,6 +59,9 @@
     <string name="hint_input_github">введите github.com/*</string>
     <string name="hint_input_mail">Введите email</string>
     <string name="logout">Выйти</string>
+    <string name="error_no_network">Сеть недоступна,попробуйте позже</string>
+    <string name="error_server">Ошибка сервера</string>
+    <string name="error_upload_photo">Не удалось загрузить фото на сервер</string>
 
 
     <string-array name="profile_placeHolder_loadPhotoDialog">

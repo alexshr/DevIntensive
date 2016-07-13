@@ -18,6 +18,7 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/rating"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:textAppearance="@style/user_rating_textAppearance"
@@ -43,6 +44,7 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/lines"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:text="@string/header_code_strings_vol"
@@ -61,6 +63,7 @@
         android:background="@color/user_rating_divider"/>
 
     <LinearLayout
+
         android:layout_width="0dp"
         android:layout_height="@dimen/size_medium_56"
         android:layout_weight="0.25"
@@ -68,6 +71,7 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/projects"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:text="@string/header_projects_vol"

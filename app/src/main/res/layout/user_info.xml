@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
+
     <LinearLayout style="@style/outer_layout">
 
         <ImageView
@@ -10,13 +13,14 @@
             android:src="@drawable/ic_call_black_24dp"/>
 
         <LinearLayout style="@style/inner_layout"
-            android:id="@+id/phone_layout">
+            >
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/phone_input"
+            <com.softdesign.devintensive.ui.view.ValidatedTextInputLayout
+                android:id="@+id/phone_layout"
                 android:layout_width="match_parent"
-
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:errorHint="@string/hint_input_phone"
+                app:regexp="@string/regexp_phone">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/phone_edit"
@@ -28,7 +32,7 @@
                     android:inputType="phone"
                     android:text="@string/contacts_mobile_vol"/>
 
-            </android.support.design.widget.TextInputLayout>
+            </com.softdesign.devintensive.ui.view.ValidatedTextInputLayout>
 
         </LinearLayout>
 
@@ -50,10 +54,12 @@
 
         <LinearLayout style="@style/inner_layout">
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/email_input"
+            <com.softdesign.devintensive.ui.view.ValidatedTextInputLayout
+                android:id="@+id/email_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:errorHint="@string/hint_input_mail"
+                app:regexp="@string/regexp_email">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/email_edit"
@@ -64,7 +70,7 @@
                     android:inputType="textEmailAddress"
                     android:text="@string/contacts_email_vol"/>
 
-            </android.support.design.widget.TextInputLayout>
+            </com.softdesign.devintensive.ui.view.ValidatedTextInputLayout>
 
         </LinearLayout>
 
@@ -85,13 +91,16 @@
 
         <LinearLayout style="@style/inner_layout">
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/vk_profile_input"
+            <com.softdesign.devintensive.ui.view.ValidatedTextInputLayout
+                android:id="@+id/vk_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:errorHint="@string/hint_input_vk"
+                app:prefix="https://"
+                app:regexp="@string/regexp_vk">
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/vk_profile_edit"
+                    android:id="@+id/vk_edit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:focusable="false"
@@ -99,7 +108,7 @@
                     android:inputType="textUri"
                     android:text="@string/contacts_vk_vol"/>
 
-            </android.support.design.widget.TextInputLayout>
+            </com.softdesign.devintensive.ui.view.ValidatedTextInputLayout>
 
         </LinearLayout>
 
@@ -120,13 +129,16 @@
 
         <LinearLayout style="@style/inner_layout">
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/repo_input"
+            <com.softdesign.devintensive.ui.view.ValidatedTextInputLayout
+                android:id="@+id/github_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:errorHint="@string/hint_input_github"
+                app:prefix="https://"
+                app:regexp="@string/regexp_github">
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/repo_edit"
+                    android:id="@+id/github_edit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:focusable="false"
@@ -134,7 +146,7 @@
                     android:inputType="textUri"
                     android:text="@string/contacts_repo_vol"/>
 
-            </android.support.design.widget.TextInputLayout>
+            </com.softdesign.devintensive.ui.view.ValidatedTextInputLayout>
 
         </LinearLayout>
 
@@ -157,11 +169,10 @@
             style="@style/inner_layout"
             android:layout_height="wrap_content">
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/about_input"
+            <com.softdesign.devintensive.ui.view.ValidatedTextInputLayout
+                android:id="@+id/about_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/spacing_normal_16">
+                android:layout_height="wrap_content">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/about_edit"
@@ -172,7 +183,7 @@
                     android:inputType="textMultiLine|textAutoCorrect|textCapSentences"
                     android:text="@string/contacts_about_vol"/>
 
-            </android.support.design.widget.TextInputLayout>
+            </com.softdesign.devintensive.ui.view.ValidatedTextInputLayout>
 
         </LinearLayout>
 

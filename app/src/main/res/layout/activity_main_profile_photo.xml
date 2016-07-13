@@ -7,7 +7,7 @@
     tools:ignore="contentDescription">
 
     <ImageView
-        android:id="@+id/user_photo_img"
+        android:id="@+id/photo_img"
         android:layout_width="match_parent"
         android:layout_height="@dimen/profile_image_size"
         android:background="@color/user_photo_bgr"
@@ -15,7 +15,7 @@
         />
 
     <RelativeLayout
-        android:id="@+id/placeholder_profilePhoto"
+        android:id="@+id/placeholder_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone">
@@ -24,7 +24,7 @@
 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/placeholder_profilePhoto_img"
+            android:layout_above="@+id/placeholder_img"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="@dimen/spacing_small_8"
             android:gravity="center"
@@ -40,7 +40,7 @@
             android:text="@string/change_profile_photo"/>
 
         <ImageView
-            android:id="@+id/placeholder_profilePhoto_img"
+            android:id="@+id/placeholder_img"
             android:layout_width="@dimen/photo_placeholder_size"
             android:layout_height="@dimen/photo_placeholder_size"
             android:layout_alignParentBottom="true"
