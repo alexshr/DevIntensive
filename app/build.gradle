@@ -31,6 +31,20 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.1.0'
     apt 'com.jakewharton:butterknife-compiler:8.1.0'
 
+// for retrofit
+    compile ('com.squareup.retrofit2:retrofit:2.1.0') {
+        exclude module: 'okhttp'
+    }
+    compile 'com.squareup.okhttp3:okhttp:3.3.1'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
+
+//circle image library
+    compile 'com.pkmmte.view:circularimageview:1.1'
+
+///
+
+
 //Material design dimens library
 // https://github.com/DmitryMalkovich/material-design-dimens
     compile 'com.dmitrymalkovich.android:material-design-dimens:1.2'

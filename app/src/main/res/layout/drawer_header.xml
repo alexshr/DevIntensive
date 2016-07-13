@@ -2,17 +2,32 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="172dp"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:background="@drawable/drawer_header_bg"
                 android:paddingBottom="@dimen/spacing_small_8"
                 android:paddingLeft="@dimen/spacing_normal_16"
                 android:paddingRight="@dimen/spacing_normal_16"
                 android:paddingTop="@dimen/spacing_medium_24">
+    <!--
+        <ImageView
+            android:id="@+id/user_avatar"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="@dimen/spacing_normal_16"/>
+    -->
+    <com.pkmmte.view.CircularImageView
+        android:id="@+id/avatar"
+        android:layout_width="@dimen/avatar_size"
+        android:layout_height="@dimen/avatar_size"
+        android:layout_marginTop="@dimen/spacing_normal_16"
+        app:border_color="@android:color/black"
+        app:border_width="4dp"
+        app:selector_stroke_color="@android:color/black"
+        app:selector="true"
+        app:selector_stroke_width="4dp"
 
-    <ImageView
-        android:id="@+id/user_avatar"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="@dimen/spacing_normal_16"/>
+        app:shadow="true"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,14 +37,14 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/user_name_txt"
+            android:id="@+id/user_name"
             style="@style/drawer_header.user_name"
-            android:text="@string/app_name"/>
+            />
 
         <TextView
-            android:id="@+id/user_email_txt"
+            android:id="@+id/user_email"
             style="@style/drawer_header.email"
-            android:text="@string/contacts_email_vol"/>
+            />
     </LinearLayout>
 
 </RelativeLayout>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ValidatedTextInputLayout">
+        <attr name="errorHint" format="string" />
+        <attr name="regexp" format="string"/>
+        <attr name="prefix" format="string"/>
+    </declare-styleable>
+</resources>
