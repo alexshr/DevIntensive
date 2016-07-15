@@ -15,7 +15,7 @@
         <LinearLayout style="@style/inner_layout"
             >
 
-            <com.softdesign.devintensive.ui.view.ValidatedTextInputLayout
+            <com.softdesign.devintensive.ui.views.ValidatedTextInputLayout
                 android:id="@+id/phone_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
                     android:inputType="phone"
                     android:text="@string/contacts_mobile_vol"/>
 
-            </com.softdesign.devintensive.ui.view.ValidatedTextInputLayout>
+            </com.softdesign.devintensive.ui.views.ValidatedTextInputLayout>
 
         </LinearLayout>
 
@@ -54,7 +54,7 @@
 
         <LinearLayout style="@style/inner_layout">
 
-            <com.softdesign.devintensive.ui.view.ValidatedTextInputLayout
+            <com.softdesign.devintensive.ui.views.ValidatedTextInputLayout
                 android:id="@+id/email_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
                     android:inputType="textEmailAddress"
                     android:text="@string/contacts_email_vol"/>
 
-            </com.softdesign.devintensive.ui.view.ValidatedTextInputLayout>
+            </com.softdesign.devintensive.ui.views.ValidatedTextInputLayout>
 
         </LinearLayout>
 
@@ -91,7 +91,7 @@
 
         <LinearLayout style="@style/inner_layout">
 
-            <com.softdesign.devintensive.ui.view.ValidatedTextInputLayout
+            <com.softdesign.devintensive.ui.views.ValidatedTextInputLayout
                 android:id="@+id/vk_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -108,7 +108,7 @@
                     android:inputType="textUri"
                     android:text="@string/contacts_vk_vol"/>
 
-            </com.softdesign.devintensive.ui.view.ValidatedTextInputLayout>
+            </com.softdesign.devintensive.ui.views.ValidatedTextInputLayout>
 
         </LinearLayout>
 
@@ -129,7 +129,7 @@
 
         <LinearLayout style="@style/inner_layout">
 
-            <com.softdesign.devintensive.ui.view.ValidatedTextInputLayout
+            <com.softdesign.devintensive.ui.views.ValidatedTextInputLayout
                 android:id="@+id/github_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -146,7 +146,7 @@
                     android:inputType="textUri"
                     android:text="@string/contacts_repo_vol"/>
 
-            </com.softdesign.devintensive.ui.view.ValidatedTextInputLayout>
+            </com.softdesign.devintensive.ui.views.ValidatedTextInputLayout>
 
         </LinearLayout>
 
@@ -169,7 +169,7 @@
             style="@style/inner_layout"
             android:layout_height="wrap_content">
 
-            <com.softdesign.devintensive.ui.view.ValidatedTextInputLayout
+            <com.softdesign.devintensive.ui.views.ValidatedTextInputLayout
                 android:id="@+id/about_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -183,7 +183,7 @@
                     android:inputType="textMultiLine|textAutoCorrect|textCapSentences"
                     android:text="@string/contacts_about_vol"/>
 
-            </com.softdesign.devintensive.ui.view.ValidatedTextInputLayout>
+            </com.softdesign.devintensive.ui.views.ValidatedTextInputLayout>
 
         </LinearLayout>
 

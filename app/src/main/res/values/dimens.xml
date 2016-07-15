@@ -53,5 +53,14 @@
         <dimen name="photo_placeholder_size">90dp</dimen>
         <dimen name="avatar_size">60dp</dimen>
 
+        <dimen name="card_corner_radius">2dp</dimen>
+        <dimen name="card_elevation">8dp</dimen>
+
+
+        <integer name="photo_placeholder_shadow_x">8</integer>
+        <integer name="photo_placeholder_shadow_y">8</integer>
+        <integer name="photo_placeholder_shadow_radius">16</integer>
+
+        <item name="user_list_item_img_aspect_ratio" format="float" type="dimen">1.78</item>
 
 </resources>

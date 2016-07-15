@@ -19,6 +19,11 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".ui.activities.MainActivity"/>
+        <activity android:name=".ui.activities.UserListActivity"
+                  android:parentActivityName=".ui.activities.UserListActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                       android:value=".ui.activities.UserListActivity"/>
+        </activity>
 
 
 

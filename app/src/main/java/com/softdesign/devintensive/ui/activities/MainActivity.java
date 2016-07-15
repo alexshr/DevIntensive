@@ -39,9 +39,9 @@ import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
-import com.softdesign.devintensive.ui.view.ValidatedTextInputLayout;
+import com.softdesign.devintensive.ui.views.ValidatedTextInputLayout;
+import com.softdesign.devintensive.utils.BorderedCircleTransform;
 import com.softdesign.devintensive.utils.ConstantManager;
-import com.softdesign.devintensive.utils.PicassoRoundTransform;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -495,6 +495,18 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
+                    case R.id.profile:
+                        /*
+                        Intent intent = new Intent(UserListActivity.this, UserListActivity.class) ;
+                        startActivity(intent);
+                        finish();
+                        */
+                        break;
+                    case R.id.team:
+                        Intent intent = new Intent(MainActivity.this, UserListActivity.class) ;
+                        startActivity(intent);
+                        finish();
+                        break;
                     case R.id.logout:
                         logout();
                         break;
@@ -516,7 +528,7 @@ public class MainActivity extends BaseActivity {
                 //.resize(mProfileImageSize, mProfileImageSize)
                 //.centerInside()
                 .placeholder(R.drawable.user_avatar)
-                .transform(new PicassoRoundTransform())
+                .transform(new BorderedCircleTransform())
                 .into(userAvatarImg);
 
         //show user name and email
@@ -528,11 +540,7 @@ public class MainActivity extends BaseActivity {
         String email=mDataManager.getPreferencesManager().getEmail();
         userEmailView.setText(email);
 
-        /*
-        Bitmap avatar = BitmapFactory.decodeResource(getResources(), R.drawable.user_avatar);
-        RoundedAvatarDrawable roundedAvatar = new RoundedAvatarDrawable(avatar);
-        userAvatar.setImageDrawable(roundedAvatar);
-*/
+
     }
 
 
