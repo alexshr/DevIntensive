@@ -45,10 +45,10 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 
     private static final String TAG_RETAIN_FRAGMENT = "rf";
 
-    private ImageView drawerUsrAvatar;
+
     private DataManager mDataManager;
     private UserListAdapter mUserListAdapter;
-    private List<UserListRes.UserData> mUsers;
+
 
     @BindView(R.id.main_coordinator_container)
     CoordinatorLayout mCoordinatorLayout;
@@ -125,7 +125,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     @Override
     public boolean onQueryTextChange(String newText) {
         if(newText!=null) {
-            final List<UserListRes.UserData> filteredModelList = filter(mUsers, newText);
+            final List<UserListRes.UserData> filteredModelList = filter(mRetainFragment.getUsersList(), newText);
             mUserListAdapter.setFilter(filteredModelList);
         }
         return false;
