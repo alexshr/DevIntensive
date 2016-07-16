@@ -1,6 +1,7 @@
 package com.softdesign.devintensive.ui.adapters;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,8 @@ import android.widget.TextView;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.ui.views.AspectRatioImageView;
+import com.softdesign.devintensive.utils.ConstantManager;
+import com.softdesign.devintensive.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -22,6 +25,9 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
     private List<UserListRes.UserData> mUserList;
     private UserViewHolder.UserItemClickListener mUserItemClickListener;
 
+    private int mWidth;
+    private int mHeight;
+
     public UserListAdapter(List<UserListRes.UserData> users, UserViewHolder.UserItemClickListener userItemClickListener) {
         mUserList = users;
         mUserItemClickListener = userItemClickListener;
@@ -31,23 +37,18 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
     public UserListAdapter.UserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         mContext = parent.getContext();
         View convertView = LayoutInflater.from(mContext).inflate(R.layout.user_list_item, parent, false);
+
+//упрощенный ресайз с учетом того, что фото захватывает всю ширину
+//TODO получить реальные размеры
+        mWidth = Utils.getScreenWidth(mContext);
+        mHeight = (int) (mWidth / AspectRatioImageView.ASPECT_RATIO);
+
         return new UserViewHolder(convertView, mUserItemClickListener);
     }
 
     @Override
     public void onBindViewHolder(UserListAdapter.UserViewHolder holder, int position) {
         UserListRes.UserData user = mUserList.get(position);
-
-        String userPhoto = user.getPublicInfo().getPhoto();
-
-        Picasso.with(mContext)
-                .load(userPhoto)
-                .resize(mContext.getResources().getDimensionPixelSize(R.dimen.profile_image_size),
-                        mContext.getResources().getDimensionPixelSize(R.dimen.profile_image_size))
-                .centerCrop()
-                .placeholder(mContext.getResources().getDrawable(R.drawable.user_bg))
-                .error(mContext.getResources().getDrawable(R.drawable.user_bg))
-                .into(holder.userPhoto);
 
         holder.mFullName.setText(user.getFullName());
         holder.mRating.setText(String.valueOf(user.getProfileValues().getRating()));
@@ -60,6 +61,17 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             holder.mBio.setVisibility(View.VISIBLE);
             holder.mBio.setText(user.getPublicInfo().getBio());
         }
+
+        String userPhoto = user.getPublicInfo().getPhoto();
+
+        Picasso.with(mContext)
+                .load(userPhoto)
+                .resize(mWidth,mHeight)
+                .centerCrop()
+                .placeholder(mContext.getResources().getDrawable(R.drawable.user_bg))
+                .error(mContext.getResources().getDrawable(R.drawable.user_bg))
+                .into(holder.userPhoto);
+
     }
 
     @Override

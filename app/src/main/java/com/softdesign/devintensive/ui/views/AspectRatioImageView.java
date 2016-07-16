@@ -9,15 +9,16 @@ import com.softdesign.devintensive.R;
 
 public class AspectRatioImageView extends ImageView {
 
-    private static final float DEFAULT_ASPECT_RATIO = 1.78f;
-    private final float mAspectRatio;
+    public static final float ASPECT_RATIO = 1.78f;
+
 
     public AspectRatioImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
-
+/*
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AspectRatioImageView);
         mAspectRatio = a.getFloat(R.styleable.AspectRatioImageView_aspect_ratio, DEFAULT_ASPECT_RATIO);
         a.recycle();
+        */
     }
 
     @Override
@@ -27,7 +28,7 @@ public class AspectRatioImageView extends ImageView {
         int newHeight;
 
         newWidth = getMeasuredWidth();
-        newHeight = (int) (newWidth / mAspectRatio);
+        newHeight = (int) (newWidth / ASPECT_RATIO);
 
         setMeasuredDimension(newWidth, newHeight);
     }

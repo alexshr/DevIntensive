@@ -10,7 +10,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -23,7 +22,9 @@ import android.widget.TextView;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.res.UserListRes;
+import com.softdesign.devintensive.data.storage.models.UserDTO;
 import com.softdesign.devintensive.ui.adapters.UserListAdapter;
+import com.softdesign.devintensive.ui.fragments.UserListRetainFragment;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.NetworkStatusChecker;
 import com.softdesign.devintensive.utils.BorderedCircleTransform;
@@ -38,9 +39,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class UserListActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class UserListActivity extends BaseActivity implements SearchView.OnQueryTextListener {
 
     private static final String LOG_TAG = ConstantManager.LOG_TAG + "_UserListActivity";
+
+    private static final String TAG_RETAIN_FRAGMENT = "rf";
 
     private ImageView drawerUsrAvatar;
     private DataManager mDataManager;
@@ -58,6 +61,11 @@ public class UserListActivity extends AppCompatActivity implements SearchView.On
     @BindView(R.id.navigation_view)
     NavigationView mNavigationView;
 
+    private UserListRetainFragment mRetainFragment;
+
+    //check if data is loaded
+    private boolean mIsListDataLoaded;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,7 +79,20 @@ public class UserListActivity extends AppCompatActivity implements SearchView.On
 
         setupToolBar();
         setupDrawer();
-        loadUsers();
+
+        mRetainFragment = (UserListRetainFragment) getSupportFragmentManager().findFragmentByTag(TAG_RETAIN_FRAGMENT);
+        if (mRetainFragment == null) {
+            mRetainFragment = new UserListRetainFragment();
+            getSupportFragmentManager().beginTransaction().add(mRetainFragment, TAG_RETAIN_FRAGMENT).commit();
+        }
+
+        //проверяем пришли ли по сети данные (а не в который раз activity открывается)
+        if (mRetainFragment.getUsersList() == null) {
+            loadUserList();
+        } else {
+            setupUsersListAdapter(mRetainFragment.getUsersList());
+        }
+
     }
 
     private void setupToolBar() {
@@ -103,9 +124,10 @@ public class UserListActivity extends AppCompatActivity implements SearchView.On
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        final List<UserListRes.UserData> filteredModelList = filter(mUsers, newText);
-        mUserListAdapter.setFilter(filteredModelList);
-
+        if(newText!=null) {
+            final List<UserListRes.UserData> filteredModelList = filter(mUsers, newText);
+            mUserListAdapter.setFilter(filteredModelList);
+        }
         return false;
     }
 
@@ -183,45 +205,62 @@ public class UserListActivity extends AppCompatActivity implements SearchView.On
         userEmailView.setText(email);
     }
 
+    private void setupUsersListAdapter(List<UserListRes.UserData> users) {
+        mUserListAdapter = new UserListAdapter(users, new UserListAdapter.UserViewHolder.UserItemClickListener() {
+            @Override
+            public void onUserItemClick(int adapterPosition) {
 
-    private void loadUsers() {
+                UserDTO userDTO = new UserDTO(mUserListAdapter.getUser(adapterPosition));
+                Intent intent = new Intent(UserListActivity.this, ProfileUserActivity.class);
+                intent.putExtra(ConstantManager.USER_DTO_KEY, userDTO);
+
+                startActivity(intent);
+
+            }
+        });
+        mRecyclerView.setAdapter(mUserListAdapter);
+    }
+
+
+    /**
+     * fetch user list and load to retain fragment
+     */
+    private void loadUserList() {
         if (NetworkStatusChecker.isNetworkAvailable(this)) {
+
+            showProgress();
+
             Call<UserListRes> call = mDataManager.getUserList();
             call.enqueue(new Callback<UserListRes>() {
                 @Override
                 public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {
                     if (response.code() == 200) {
-                        mUsers = response.body().getData();
-                        mUserListAdapter = new UserListAdapter(mUsers, new UserListAdapter.UserViewHolder.UserItemClickListener() {
-                            @Override
-                            public void onUserItemClick(int adapterPosition) {
-                                //UserDTO userDTO = new UserDTO(mUsers.get(adapterPosition));
-                                /*
-                                UserDTO userDTO = new UserDTO(mUserListAdapter.getUser(adapterPosition));
-                                Intent profileIntent = new Intent(UserListActivity.this, ProfileUserActivity.class);
-                                profileIntent.putExtra(ConstantManager.USER_DTO_KEY, userDTO);
 
-                                startActivity(profileIntent);
-                                */
-                            }
-                        });
-                        mRecyclerView.setAdapter(mUserListAdapter);
+                        mRetainFragment.setUsersList(response.body().getData());
+                        setupUsersListAdapter(mRetainFragment.getUsersList());
+
                     } else {
                         showSnackbar("Не удалось получить данные с сервера: " + response.code());
                     }
+                    hideProgress();
                 }
 
                 @Override
                 public void onFailure(Call<UserListRes> call, Throwable t) {
                     showSnackbar("Ошибка: " + t.getMessage());
+                    hideProgress();
                 }
             });
+
         } else {
             showSnackbar("Сеть на данный момент недоступна, попробуйте позже");
+
         }
     }
 
     private void logout() {
         startActivity(new Intent(this, LoginActivity.class));
     }
+
+
 }
