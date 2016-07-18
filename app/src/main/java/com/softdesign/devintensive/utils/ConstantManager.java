@@ -56,5 +56,5 @@ public interface ConstantManager {
     int REQUEST_GALLERY_PICTURE = 2;
 
 
-
+    String USER_DTO_KEY ="USER_DTO_KEY" ;
 }

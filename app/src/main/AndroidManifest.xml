@@ -19,15 +19,28 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".ui.activities.MainActivity"/>
-
+        <activity
+            android:name=".ui.activities.UserListActivity"
+            android:parentActivityName=".ui.activities.UserListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.activities.UserListActivity"/>
+        </activity>
+        <activity
+            android:name=".ui.activities.ProfileUserActivity"
+            android:parentActivityName=".ui.activities.UserListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.activities.UserListActivity"/>
+        </activity>
 
 
         <activity android:name=".ui.activities.LoginActivity">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN"/>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
 
-            <category android:name="android.intent.category.LAUNCHER"/>
-        </intent-filter>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
     </application>
 

@@ -2,8 +2,12 @@ package com.softdesign.devintensive.utils;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.graphics.Point;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.view.Display;
+import android.view.WindowManager;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -39,7 +43,17 @@ public class Utils {
         return image;
     }
 
+    //http://stackoverflow.com/questions/1016896/get-screen-dimensions-in-pixels
 
+    public static int getScreenWidth(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+
+        Point size = new Point();
+        display.getSize(size);
+
+        return size.x;
+    }
 
 
 }
