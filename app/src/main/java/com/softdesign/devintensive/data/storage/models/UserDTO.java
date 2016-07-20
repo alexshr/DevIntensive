@@ -9,6 +9,9 @@ import com.softdesign.devintensive.data.network.res.UserModelRes;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * для передачи данных пользователя из списка в деталицию
+ */
 public class UserDTO implements Parcelable {
 
     private String mPhoto;

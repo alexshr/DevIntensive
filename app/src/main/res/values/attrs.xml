@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="ValidatedTextInputLayout">
+        <!--подсказка над текстом при ошибке-->
         <attr name="errorHint" format="string" />
+
+        <!--сообщение об ошибке под текстом-->
+        <attr name="errorMessage" format="string" />
+
+        <!--рег. выражение для валидации-->
         <attr name="regexp" format="string"/>
-        <attr name="prefix" format="string"/>
+
+        <!--стиль текста для обычной подсказки-->
+        <attr name="captionTextAppearance" format="reference"/>
+
+        <!--нужно ли удалять http и https префиксы-->
+        <attr name="isToRemoveHttpPrefix" format="boolean"/>
+
     </declare-styleable>
 
     <declare-styleable name="AspectRatioImageView">

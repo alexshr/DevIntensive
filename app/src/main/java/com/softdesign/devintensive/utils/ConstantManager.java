@@ -3,20 +3,9 @@ package com.softdesign.devintensive.utils;
 public interface ConstantManager {
     String LOG_TAG = "DEV";
 
-    String VK_BASE = "vk.com";
-    String GITHUB_BASE = "github.com";
-
-    //String EMAIL_PATTERN = "^[a-zA-Z0-9#_~!$&'()*+,;=:.\"(),:;<>@\\[\\]\\\\]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*$";
-    //String PHONE_PATTERN ="^[+][0-9]{11,20}$";
-    String VK_PATTERN ="^("+VK_BASE+"/)[a-zA-Z0-9-]+$";
-    String GITHUB_PATTERN ="^("+GITHUB_BASE+"/)[a-zA-Z0-9-]+$";
-
     //keys for store in PreferenceManager
     String USER_ID_KEY = "USER_ID_KEY";
     String AUTH_TOKEN_KEY = "AUTH_TOKEN_KEY";
-
-    String USER_LOGIN = "USER_LOGIN";
-    String USER_PASS = "USER_PASS";
 
     String EDIT_MODE_KEY = "EDIT_MODE_KEY";
     String USER_PHONE_KEY = "USER_PHONE_KEY";
@@ -32,13 +21,15 @@ public interface ConstantManager {
     String USER_FIRST_NAME = "USER_FIRST_NAME";
     String USER_SECOND_NAME = "USER_SECOND_NAME";
 
-    String USER_PHOTO_URL_KEY = "USER_PHOTO_URL_KEY";
-    String USER_AVATAR_URL_KEY = "USER_AVATAR_URL_KEY";
-
     String USER_PHOTO_LOCAL_URI = "USER_PHOTO_LOCAL_URI";
 
     String USER_PHOTO_URI = "USER_PHOTO_URI";
     String USER_AVATAR_URI = "USER_AVATAR_URI";
+
+    String USER_DTO_KEY ="USER_DTO_KEY" ;
+    String USER_LOGIN_KEY = "USER_LOGIN_KEY";
+
+    String USER_PASS_KEY = "USER_PASS_KEY";
 
 
 
@@ -56,5 +47,7 @@ public interface ConstantManager {
     int REQUEST_GALLERY_PICTURE = 2;
 
 
-    String USER_DTO_KEY ="USER_DTO_KEY" ;
+
+
+
 }

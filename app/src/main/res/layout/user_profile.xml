@@ -1,71 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
+
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingTop="112dp"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+    <LinearLayout style="@style/outer_layout"
+        >
 
-        <LinearLayout style="@style/outer_line_layout_element">
+        <ImageView
+            style="@style/user_info_icon.left"
+            android:src="@drawable/ic_git_circle_24dp"/>
 
-            <ImageView
-                style="@style/user_info_icon.left"
-                android:src="@drawable/ic_git_circle_24dp"/>
+        <ListView
+            android:id="@+id/repositories_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/user_profile_rep_list_margin_left">
 
-            <ListView
-                android:id="@+id/repositories_list"
+        </ListView>
+
+        <!--
+        <ImageView
+            android:id="@+id/view_repo_img"
+            style="@style/user_info_icon.right"
+            android:src="@drawable/ic_visibility_black_24dp"/>
+-->
+    </LinearLayout>
+
+    <View style="@style/divider"/>
+
+    <LinearLayout style="@style/outer_line_layout_element">
+
+        <ImageView
+            style="@style/user_info_icon.left"
+            android:src="@drawable/ic_account_circle_black_24dp"/>
+
+        <LinearLayout style="@style/inner_line_layout_element">
+
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/spacing_medium_32">
+                android:paddingTop="@dimen/user_profile_about_caption_padding_top"
+                >
 
-            </ListView>
-
-            <ImageView
-                android:id="@+id/view_repo_img"
-                style="@style/user_info_icon.right"
-                android:src="@drawable/ic_visibility_black_24dp"/>
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/line_size"
-            android:layout_marginLeft="@dimen/spacing_larger_72"
-            android:background="@color/grey_light"/>
-
-        <LinearLayout style="@style/outer_line_layout_element">
-
-            <ImageView
-                style="@style/user_info_icon.left"
-                android:src="@drawable/ic_account_circle_black_24dp"/>
-
-            <LinearLayout style="@style/inner_line_layout_element">
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
+                <EditText
+                    android:id="@+id/about_edit"
                     android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/spacing_normal_16">
+                    android:layout_width="match_parent"
+                    android:enabled="false"
+                    android:focusable="false"
 
-                    <EditText
-                        android:id="@+id/about_edit"
-                        style="@style/text_edit_element"
-                        android:hint="@string/contacts_about"
-                        android:inputType="textMultiLine|textAutoCorrect|textCapSentences"
-                        android:text="@string/contacts_about_vol"/>
+                    android:textColor="@android:color/black"
 
-                </android.support.design.widget.TextInputLayout>
+                    android:fontFamily="@string/font_condensed"
+                    android:hint="@string/contacts_about"
 
-            </LinearLayout>
+                    android:text="@string/contacts_test_about_vol"/>
+
+            </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
 
     </LinearLayout>
 
-</android.support.v4.widget.NestedScrollView>
+</LinearLayout>
+

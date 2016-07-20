@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
-import com.softdesign.devintensive.ui.adapters.RepositoriesAdapter;
+import com.softdesign.devintensive.ui.adapters.RepositoryListAdapter;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.squareup.picasso.Picasso;
 
@@ -25,6 +25,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.softdesign.devintensive.utils.Utils.setListViewHeightBasedOnChildren;
+
+/**
+ * окно данных пользователя выбранного из списка
+ */
 public class ProfileUserActivity extends BaseActivity {
 
     @BindView(R.id.toolbar)
@@ -63,8 +68,8 @@ public class ProfileUserActivity extends BaseActivity {
         UserDTO userDTO = getIntent().getParcelableExtra(ConstantManager.USER_DTO_KEY);
 
         final List<String> repositories = userDTO.getRepositories();
-        final RepositoriesAdapter repositoriesAdapter = new RepositoriesAdapter(this, repositories);
-        mRepoListView.setAdapter(repositoriesAdapter);
+        final RepositoryListAdapter repositoryListAdapter = new RepositoryListAdapter(this, repositories);
+        mRepoListView.setAdapter(repositoryListAdapter);
         mRepoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -73,6 +78,8 @@ public class ProfileUserActivity extends BaseActivity {
                 startActivity(viewRepoIntent);
             }
         });
+
+        setListViewHeightBasedOnChildren(mRepoListView);
 
         mUserBio.setText(userDTO.getBio());
         mUserRating.setText(userDTO.getRating());

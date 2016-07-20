@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">Шраго Александр</string>
+    <string name="app_name">НеШраго Александр</string>
 
-    <!-- Contacts page info -->
+
     <string name="header_rating">Рейтинг</string>
     <string name="header_code_strings">Написано строк кода</string>
     <string name="header_projects">Проектов</string>
@@ -13,37 +13,17 @@
     <string name="contacts_about">О себе</string>
 
 
-    <!-- Temporary volumes of contacts page info -->
-    <string name="header_rating_vol">6</string>
-    <string name="header_code_strings_vol">36000</string>
-    <string name="header_projects_vol">6</string>
 
-    <string name="contacts_mobile_vol">+7 (903) 000-00-00</string>
-    <string name="contacts_email_vol">alexshr@yandex.ru</string>
-    <string name="contacts_vk_vol">vk.com/alexshr</string>
-    <string name="contacts_repo_vol">https://github.com/alexshr/DevIntensive</string>
-    <string name="contacts_about_vol">Lorem ipsum dolor sit amet, consectitur adipiscing elit.
-        Nulla quam velit, vulputate eu pharetra nec, mattis ac neque. Duis vulputate commodo
-        lectus, ac blandit elit. Lorem ipsum dolor sit amet, consectitur adipiscing elit.
-        Nulla quam velit, vulputate eu pharetra nec, mattis ac neque. Duis vulputate commodo
-        lectus, ac blandit elit. Lorem ipsum dolor sit amet, consectitur adipiscing elit.
-        Nulla quam velit, vulputate eu pharetra nec, mattis ac neque. Duis vulputate commodo
-        lectus, ac blandit elit.Lorem ipsum dolor sit amet, consectitur adipiscing elit.
-        Nulla quam velit, vulputate eu pharetra nec, mattis ac neque. Duis vulputate commodo
-        lectus, ac blandit elit.
-    </string>
+
 
     <string name="change_profile_photo">Изменить фотографию профиля</string>
-
-
 
 
     <string name="auth_enter">Войти</string>
     <string name="auth_email">E-mail</string>
     <string name="auth_pass">Пароль</string>
 
-    <string name="auth_email_default">test@test.ru</string>
-    <string name="auth_pass_default">test</string>
+
 
     <string name="allow">Разрешить</string>
     <string name="hint.choosePhoto">Выберите фотографию</string>
@@ -54,23 +34,57 @@
         требуемые разрешения
     </string>
 
-    <string name="hint_input_phone">введите \'+\' и 11-20 цифр</string>
-    <string name="hint_input_vk">введите vk.com/*</string>
-    <string name="hint_input_github">введите github.com/*</string>
+    <string name="hint_input_phone">Мобильный (11-20 цифр)</string>
+    <string name="hint_input_vk">Профиль VK (vk.com/*)</string>
+    <string name="hint_input_github">Профиль github (github.com)</string>
     <string name="hint_input_mail">Введите email</string>
+
+    <string name="error_input_phone">Неверный номер телефона</string>
+    <string name="error_input_vk">Неверный профиль VK</string>
+    <string name="error_input_github">Неверный профиль github</string>
+
+    <string name="error_input_mail">Неверный email</string>
+
     <string name="logout">Выйти</string>
     <string name="error_no_network">Сеть недоступна,попробуйте позже</string>
     <string name="error_server">Ошибка сервера</string>
     <string name="error_upload_photo">Не удалось загрузить фото на сервер</string>
     <string name="show_details">ПРОСМОТР</string>
     <string name="search_title">поиск</string>
+    <string name="team">Команда</string>
+    <string name="my_profile">Мой профиль</string>
 
 
-    <string-array name="profile_placeHolder_loadPhotoDialog">
+    <string-array name="photo_dialog_choices">
         <item>Сделать снимок</item>
         <item>Выбрать из галереи</item>
         <item>Отмена</item>
     </string-array>
+
+
+
+    <!-- test volumes of contacts page info -->
+    <string name="header_test_rating_vol">6</string>
+    <string name="header_test_code_strings_vol">36000</string>
+    <string name="header_test_projects_vol">6</string>
+
+    <string name="contacts_test_mobile_vol">+7 (903) 000-00-00</string>
+    <string name="contacts_test_email_vol">alexshr@yandex.ru</string>
+    <string name="contacts_test_vk_vol">vk.com/alexshr</string>
+    <string name="contacts_test_repo_vol">https://github.com/alexshr/DevIntensive</string>
+    <string name="contacts_test_about_vol">Lorem ipsum dolor sit amet, consectitur adipiscing elit.
+        Nulla quam velit, vulputate eu pharetra nec, mattis ac neque. Duis vulputate commodo
+        lectus, ac blandit elit. Lorem ipsum dolor sit amet, consectitur adipiscing elit.
+        Nulla quam velit, vulputate eu pharetra nec, mattis ac neque. Duis vulputate commodo
+        lectus, ac blandit elit. Lorem ipsum dolor sit amet, consectitur adipiscing elit.
+        Nulla quam velit, vulputate eu pharetra nec, mattis ac neque. Duis vulputate commodo
+        lectus, ac blandit elit.Lorem ipsum dolor sit amet, consectitur adipiscing elit.
+        Nulla quam velit, vulputate eu pharetra nec, mattis ac neque. Duis vulputate commodo
+        lectus, ac blandit elit.
+    </string>
+
+    <string name="auth_test_email">test@test.ru</string>
+    <string name="auth_test_pass">test</string>
 
 
 </resources>

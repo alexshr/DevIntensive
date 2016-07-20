@@ -9,13 +9,14 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.managers.PreferencesManager;
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
-import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.NetworkStatusChecker;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
     private DataManager mDataManager;
+    private PreferencesManager mPrefManager;
 
     @BindView(R.id.coordinator_layout)
     CoordinatorLayout mCoordinatorLayout;
@@ -43,6 +45,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     EditText mPassword;
     @BindView(R.id.pass_layout)
     TextInputLayout mPassLayout;
+
+    @BindView(R.id.progress)
+    ProgressBar mProgressBar;
+
+    @BindView(R.id.auth_layout)
+    RelativeLayout mAuthLayout;
 
 
     @OnClick({R.id.remember, R.id.auth_button})
@@ -62,7 +70,31 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
         ButterKnife.bind(this);
+        mAuthLayout.setVisibility(View.INVISIBLE);
+        mProgressBar.setVisibility(View.INVISIBLE);
         mDataManager = DataManager.getInstance();
+        mPrefManager = mDataManager.getPreferencesManager();
+        if (mPrefManager.getLogin().length() > 0) {
+            showProgress();
+            login();
+        } else {
+            showLoginLayout();
+        }
+    }
+
+
+    private void showProgress() {
+        mAuthLayout.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.VISIBLE);
+        /*
+        mProgressBar.getIndeterminateDrawable().setColorFilter(
+                Color.RED, android.graphics.PorterDuff.Mode.SRC_IN);
+*/
+    }
+
+    private void showLoginLayout() {
+        mAuthLayout.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.GONE);
     }
 
     private void rememberPassword() {
@@ -74,8 +106,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void login() {
         if (NetworkStatusChecker.isNetworkAvailable(this)) {
 
+            String login = mLogin.getText().toString();
+            String pass = mPassword.getText().toString();
+            if (mPrefManager.getLogin().length() > 0) {
+                login = mPrefManager.getLogin();
+                pass = mPrefManager.getPassword();
+            }
+
             Call<UserModelRes> call = mDataManager.loginUser(
-                    new UserLoginReq(mLogin.getText().toString(), mPassword.getText().toString()));
+                    new UserLoginReq(login, pass));
             // asynchr call
             call.enqueue(new Callback<UserModelRes>() {
                 @Override
@@ -83,8 +122,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     if (response.code() == 200) {
                         onLoginSuccess(response.body());
                     } else if (response.code() == 404) {
+                        mPrefManager.removeAuth();
                         showSnackbar("Неверный логин или пароль");
                     } else {
+                        mPrefManager.removeAuth();
                         showSnackbar(getString(R.string.error_server));
                     }
                 }
@@ -92,6 +133,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 @Override
                 public void onFailure(Call<UserModelRes> call, Throwable t) {
                     // TODO: handle error
+                    mPrefManager.removeAuth();
+                    showLoginLayout();
                 }
             });
 
@@ -101,28 +144,31 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void onLoginSuccess(UserModelRes userModel) {
-        mDataManager.getPreferencesManager().saveAuthToken(userModel.getData().getToken());
-        mDataManager.getPreferencesManager().saveUserId(userModel.getData().getUser().getId());
+
+        mPrefManager.saveUserId(userModel.getData().getUser().getId());
+        mPrefManager.saveAuthToken(userModel.getData().getToken());
+
+        if(mPrefManager.getLogin().isEmpty()){
+            mPrefManager.saveLogin(mLogin.getText().toString());
+            mPrefManager.savePassword(mPassword.getText().toString());
+        }
+
         saveUserValues(userModel);
         saveUserData(userModel);
         saveUserName(userModel);
 
         saveImagesUrls(userModel);
 
-        Intent intent = new Intent(this, MainActivity.class);
-        /*
-        intent.putExtra(ConstantManager.USER_PHOTO_URL_KEY,
-                userModel.getData().getUser().getPublicInfo().getPhoto());
-        intent.putExtra(ConstantManager.USER_AVATAR_URL_KEY,
-                userModel.getData().getUser().getPublicInfo().getAvatar());
-        */
+        Intent intent = new Intent(this, UserListActivity.class);
+
         startActivity(intent);
+        finish();
     }
 
     private void saveImagesUrls(UserModelRes userModel) {
-        PreferencesManager pm=mDataManager.getPreferencesManager();
-        pm.savePhotoUri(userModel.getData().getUser().getPublicInfo().getPhoto());
-        pm.saveAvatarUri(userModel.getData().getUser().getPublicInfo().getAvatar());
+
+        mPrefManager.savePhotoUri(userModel.getData().getUser().getPublicInfo().getPhoto());
+        mPrefManager.saveAvatarUri(userModel.getData().getUser().getPublicInfo().getAvatar());
 
 
     }
@@ -138,7 +184,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 userModel.getData().getUser().getProfileValues().getProjects()
         };
 
-        mDataManager.getPreferencesManager().saveUserProfileValues(userValues);
+        mPrefManager.saveUserProfileValues(userValues);
     }
 
     /**
@@ -153,7 +199,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String bio = userModel.getData().getUser().getPublicInfo().getBio();
         userFields.add(bio.isEmpty() ? "" : bio);
 
-        mDataManager.getPreferencesManager().saveUserProfileData(userFields);
+        mPrefManager.saveUserProfileData(userFields);
     }
 
     /**
@@ -165,7 +211,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 userModel.getData().getUser().getSecondName()
         };
 
-        mDataManager.getPreferencesManager().saveUserName(userNames);
+        mPrefManager.saveUserName(userNames);
     }
 
 

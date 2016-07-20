@@ -3,6 +3,7 @@ package com.softdesign.devintensive.ui.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -16,7 +17,9 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
@@ -61,6 +64,10 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     @BindView(R.id.navigation_view)
     NavigationView mNavigationView;
 
+    @BindView(R.id.progress)
+    ProgressBar mProgressBar;
+
+
     private UserListRetainFragment mRetainFragment;
 
     //check if data is loaded
@@ -102,6 +109,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(R.string.team);
         }
     }
 
@@ -124,7 +132,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        if(newText!=null) {
+        if (newText != null) {
             final List<UserListRes.UserData> filteredModelList = filter(mRetainFragment.getUsersList(), newText);
             mUserListAdapter.setFilter(filteredModelList);
         }
@@ -148,6 +156,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             mNavigationDrawer.openDrawer(GravityCompat.START);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -158,14 +167,14 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 
     private void setupDrawer() {
         final NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        assert navigationView != null;
+        navigationView.getMenu().getItem(0).setChecked(true);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.profile:
 
-                        Intent intent = new Intent(UserListActivity.this, UserListActivity.class);
+                        Intent intent = new Intent(UserListActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
 
@@ -258,9 +267,17 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
         }
     }
 
-    private void logout() {
-        startActivity(new Intent(this, LoginActivity.class));
+    @Override
+    /**
+     * ProgressDialog у родителя блокирует кнопки drawer и назад
+     * поэтому переопределяем
+     */
+    public void showProgress() {
+        mProgressBar.setVisibility(View.VISIBLE);
     }
 
-
+    @Override
+    public void hideProgress() {
+        mProgressBar.setVisibility(View.INVISIBLE);
+    }
 }

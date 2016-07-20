@@ -2,6 +2,7 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_coordinator_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -17,7 +18,7 @@
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:contentScrim="@color/grey"
+            app:contentScrim="@color/color_grey"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
@@ -28,14 +29,16 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/user_bg"/>
 
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:titleTextColor="@color/white"
+                android:titleTextColor="@android:color/white"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay"
-                app:theme="@style/user_profile_toolbar_style"/>
+                app:theme="@style/user_profile_toolbar_style"
+                />
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -44,77 +47,22 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/grey"
-        android:orientation="horizontal"
-        android:paddingBottom="@dimen/spacing_medium_32"
-        android:paddingTop="@dimen/spacing_medium_32"
-        app:layout_behavior="com.softdesign.devintensive.ui.behaviors.HeaderBehavior">
+        android:orientation="vertical"
+        app:layout_behavior=".ui.behaviors.CustomScrollingBehavior"            >
 
-    >
+        <include layout="@layout/user_ratings"/>
 
-        <LinearLayout
-            android:layout_width="0dp"
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/scroll_container"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            tools:context=".ui.activities.MainActivity">
 
-            <TextView
-                android:id="@+id/rating"
-                style="@style/header_text.large"
-                android:text="@string/header_rating_vol"/>
+            <include layout="@layout/user_profile"/>
 
-            <TextView
-                style="@style/header_text"
-                android:text="@string/header_rating"/>
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="@dimen/line_size"
-            android:layout_height="match_parent"
-            android:background="@color/grey_light"/>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/lines"
-                style="@style/header_text.large"
-                android:text="@string/header_code_strings_vol"/>
-
-            <TextView
-                style="@style/header_text"
-                android:text="@string/header_code_strings"/>
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="@dimen/line_size"
-            android:layout_height="match_parent"
-            android:background="@color/grey_light"/>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/projects"
-                style="@style/header_text.large"
-                android:text="@string/header_projects_vol"/>
-
-            <TextView
-                style="@style/header_text"
-                android:text="@string/header_projects"/>
-
-        </LinearLayout>
-
+        </android.support.v4.widget.NestedScrollView>
     </LinearLayout>
 
-    <include layout="@layout/user_profile"/>
 
 </android.support.design.widget.CoordinatorLayout>

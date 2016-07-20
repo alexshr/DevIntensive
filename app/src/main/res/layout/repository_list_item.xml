@@ -1,20 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/size_large_72">
+                android:layout_height="@dimen/rep_list_item_height">
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginRight="@dimen/size_large_72">
+       android:layout_marginRight="@dimen/rep_list_item_input_layout_margin_right">
 
         <EditText
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:enabled="false"
+            android:focusable="false"
             android:id="@+id/repo_edit"
-            style="@style/text_edit_element"
+            android:textColor="@android:color/black"
+            android:fontFamily="@string/font_condensed"
             android:hint="@string/contacts_repo"
             android:inputType="textUri"
-            android:text="@string/contacts_repo_vol"/>
+            android:text="@string/contacts_test_repo_vol"/>
 
     </android.support.design.widget.TextInputLayout>
 

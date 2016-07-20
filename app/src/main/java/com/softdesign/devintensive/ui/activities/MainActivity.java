@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -64,6 +65,10 @@ import static com.softdesign.devintensive.utils.ConstantManager.REQUEST_PERMISSI
 import static com.softdesign.devintensive.utils.ConstantManager.REQUEST_PERMISSIONS_READ_SDCARD_SETTINGS;
 import static com.softdesign.devintensive.utils.Utils.createImageFile;
 
+/**
+ * окно профиля залогинившегося пользователя
+ * вся логика работы полей ввода, включая валидацию, подсказки и пр перенесены в custom view
+ */
 public class MainActivity extends BaseActivity {
 
 
@@ -123,6 +128,10 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.about_layout)
     ValidatedTextInputLayout mUserAboutLayout;
 
+    @BindView(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout mCollapsingToolbar;
+
+
     // edit mode
     private boolean mIsEditMode;
 
@@ -159,19 +168,19 @@ public class MainActivity extends BaseActivity {
                 showDialog(ConstantManager.LOAD_PROFILE_PHOTO);
                 break;
             case R.id.call_img:
-                Intent makeCall = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", mUserPhoneLayout.getTextForIntent(), null));
+                Intent makeCall = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", mUserPhoneLayout.getText(), null));
                 startActivity(makeCall);
                 break;
             case R.id.email_img:
-                Intent sendEmail = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", mUserMailLayout.getTextForIntent(), null));
+                Intent sendEmail = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", mUserPhoneLayout.getText(), null));
                 startActivity(sendEmail);
                 break;
             case R.id.vk_img:
-                Intent openVK = new Intent(Intent.ACTION_VIEW, Uri.parse("https://" + mUserVkLayout.getTextForIntent()));
+                Intent openVK = new Intent(Intent.ACTION_VIEW, Uri.parse("https://" + mUserPhoneLayout.getText()));
                 startActivity(openVK);
                 break;
             case R.id.repo_img:
-                Intent openGitHub = new Intent(Intent.ACTION_VIEW, Uri.parse("https://" + mUserGithub.getTextForIntent()));
+                Intent openGitHub = new Intent(Intent.ACTION_VIEW, Uri.parse("https://" + mUserPhoneLayout.getText()));
                 startActivity(openGitHub);
                 break;
         }
@@ -233,32 +242,6 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-///////////////////////////////////////////////////////////
-        /*
-        сворачивание плашки (простейшее решение!)
-        синхронизируем 1:1 величину паддинга плашки с величиной развертывания AppBarLayout,
-        но только на интервале, в котором может изменяться padding.
-        */
-        mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            int scrollRange = -1;
-            int maxPadding = mUserRatingLayout.getResources().getDimensionPixelSize(R.dimen.spacing_medium_28);
-
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-
-                if (scrollRange == -1) {
-                    scrollRange = appBarLayout.getTotalScrollRange();
-                }
-
-                int pos = scrollRange + verticalOffset;
-
-                int padding = (pos >= maxPadding ? maxPadding : pos);
-                mUserRatingLayout.setPadding(0, padding, 0, padding);
-
-                Log.d(LOG_TAG, "AppBarLayout scrollRange=" + mAppBarLayout.getTotalScrollRange() + " verticalOffset=" + verticalOffset + " padding=" + padding);
-            }
-        });
-////////////////////////////////////////////////
 
         setupToolbar();
 
@@ -284,7 +267,7 @@ public class MainActivity extends BaseActivity {
     protected Dialog onCreateDialog(int id) {
         switch (id) {
             case ConstantManager.LOAD_PROFILE_PHOTO:
-                String[] selectedItems = getResources().getStringArray(R.array.profile_placeHolder_loadPhotoDialog);
+                String[] selectedItems = getResources().getStringArray(R.array.photo_dialog_choices);
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getString(R.string.change_profile_photo));
                 builder.setItems(selectedItems, new DialogInterface.OnClickListener() {
@@ -313,6 +296,7 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             mNavigationDrawer.openDrawer(GravityCompat.START);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -467,7 +451,7 @@ public class MainActivity extends BaseActivity {
     private void placeProfilePicture(Uri selectedImage) {
         Picasso.with(this)
                 .load(selectedImage)
-                //.resize(mProfileImageSize, mProfileImageSize)
+                .resize(mProfileImageSize, mProfileImageSize)
                 //.centerInside()
                 .placeholder(R.drawable.user_bg)
                 .into(mUserPhotoImg);
@@ -486,11 +470,13 @@ public class MainActivity extends BaseActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        mCollapsingToolbar.setTitle(mDataManager.getPreferencesManager().getUserName());
+
     }
 
     private void setupDrawer() {
         final NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        assert navigationView != null;
+        navigationView.getMenu().getItem(1).setChecked(true);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -510,11 +496,10 @@ public class MainActivity extends BaseActivity {
                     case R.id.logout:
                         logout();
                         break;
-                    default:
-                        showSnackBar(item.getTitle().toString());
-                        item.setChecked(true);
-                }
 
+
+                }
+                item.setChecked(true);
                 mNavigationDrawer.closeDrawer(GravityCompat.START);
                 return false;
             }
@@ -586,7 +571,7 @@ public class MainActivity extends BaseActivity {
     private void loadUserInfoValue() {
         List<String> userData = mDataManager.getPreferencesManager().loadUserProfileData();
         for (int i = 0; i < userData.size(); i++) {
-            mEditLayoutList.get(i).getEditText().setText(userData.get(i));
+            mEditLayoutList.get(i).setText(userData.get(i));
         }
 
         userData = mDataManager.getPreferencesManager().loadUserProfileValues();
@@ -598,15 +583,13 @@ public class MainActivity extends BaseActivity {
     private void saveUserInfo() {
         List<String> userData = new ArrayList<>();
         for (ValidatedTextInputLayout userInfoView : mEditLayoutList) {
-            userData.add(userInfoView.getTextToStore());
+            userData.add(userInfoView.getText());
         }
         mDataManager.getPreferencesManager().saveUserProfileData(userData);
 
     }
 
-    private void logout() {
-        startActivity(new Intent(this, LoginActivity.class));
-    }
+
 
 
 }

@@ -1,8 +1,7 @@
 package com.softdesign.devintensive.utils;
 
 /**
- * Created by alexshr on 14.07.2016.
- * Picasso transformation to circle
+ *  Picasso transformation to circle
  */
 
 import android.graphics.Bitmap;

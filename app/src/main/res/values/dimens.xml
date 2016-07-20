@@ -3,14 +3,14 @@
         <dimen name="activity_horizontal_margin">16dp</dimen>
         <dimen name="activity_vertical_margin">16dp</dimen>
 
-        <!-- Font sizes -->
+        <dimen name="size_72">72dp</dimen>
+        <dimen name="spacing_32">32dp</dimen>
+        <dimen name="spacing_16">16dp</dimen>
+        <dimen name="spacing_72">72dp</dimen>
+        <dimen name="spacing_24">24dp</dimen>
 
-        <dimen name="font_size_24">24sp</dimen>
 
-
-
-
-        <!-- Spaces -->
+        <!--
         <dimen name="spacing_larger_72">72dp</dimen>
         <dimen name="spacing_large_56">56dp</dimen>
         <dimen name="spacing_medium_48">48dp</dimen>
@@ -21,11 +21,13 @@
         <dimen name="spacing_small_8">8dp</dimen>
         <dimen name="spacing_tiny_4">4dp</dimen>
 
-        <!-- Sizes -->
+
         <dimen name="size_large_72">72dp</dimen>
         <dimen name="size_medium_56">56dp</dimen>
         <dimen name="size_medium_48">48dp</dimen>
         <dimen name="size_small_24">24dp</dimen>
+
+        -->
 
         <dimen name="line_size">1dp</dimen>
         <dimen name="profile_image_size">256dp</dimen>
@@ -53,8 +55,35 @@
         <dimen name="photo_placeholder_size">90dp</dimen>
         <dimen name="avatar_size">60dp</dimen>
 
-        <dimen name="card_corner_radius">2dp</dimen>
+        <dimen name="card_corner_radius">4dp</dimen>
         <dimen name="card_elevation">8dp</dimen>
+        <dimen name="rating_layout_height">56dp</dimen>
+        <dimen name="spacing_8">8dp</dimen>
+        <dimen name="photo_placeholder_img_margin_bottom">56dp</dimen>
+        <dimen name="user_profile_rep_list_margin_left">32dp</dimen>
+        <dimen name="user_profile_about_caption_padding_top">16dp</dimen>
+        <dimen name="drawer_header_padding_v">24dp</dimen>
+        <dimen name="drawer_header_padding_h">16dp</dimen>
+        <dimen name="drawer_header_padding_b">8dp</dimen>
+        <dimen name="drawer_header_padding_t">24dp</dimen>
+        <dimen name="drawer_header_avatar_margin_top">16dp</dimen>
+        <dimen name="drawer_header_user_name_layout_height">56dp</dimen>
+        <dimen name="rep_list_item_input_layout_margin_right">72dp</dimen>
+        <dimen name="rep_list_item_height">72dp</dimen>
+        <dimen name="user_list_margin_top">56dp</dimen>
+        <dimen name="user_list_padding_h">8dp</dimen>
+        <dimen name="user_list_item_name_padding_b">24dp</dimen>
+        <dimen name="user_list_item_name_padding_h">16dp</dimen>
+        <dimen name="user_ratings_padding_v">24dp</dimen>
+        <dimen name="user_ratings_divider_height">56dp</dimen>
+        <dimen name="user_ratings_info_layout_height">56dp</dimen>
+        <dimen name="user_list_item_bio_padding_h">16dp</dimen>
+        <dimen name="user_list_item_divider_margin_b">8dp</dimen>
+        <dimen name="user_list_item_divider_margin_t">16dp</dimen>
+        <dimen name="user_list_item_button_padding_h">16dp</dimen>
+        <dimen name="item_user_list_card_elevation">4dp</dimen>
+        <dimen name="user_list_item_ratings_padding_v">12dp</dimen>
+        <dimen name="user_list_item_ratings_padding_t">8dp</dimen>
 
 
         <integer name="photo_placeholder_shadow_x">8</integer>

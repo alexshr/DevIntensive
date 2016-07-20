@@ -1,6 +1,7 @@
 package com.softdesign.devintensive.ui.activities;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -10,13 +11,17 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.softdesign.devintensive.R;
+import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.utils.ConstantManager;
 
-
-public class BaseActivity extends AppCompatActivity  {
+/**
+ * умеет только выводить неудачный диалог(
+ */
+public class BaseActivity extends AppCompatActivity {
     private static final String LOG_TAG = ConstantManager.LOG_TAG;
     protected ProgressDialog mProgressDialog;
 
+//worry about blocking activities home and back buttons!!!
     public void showProgress() {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this, R.layout.progress_splash);
@@ -28,11 +33,14 @@ public class BaseActivity extends AppCompatActivity  {
             mProgressDialog.show();
             mProgressDialog.setContentView(R.layout.progress_splash);
         }
-        runWithDelay();
+        //runWithDelay();
     }
 
     public void hideProgress() {
-        mProgressDialog.hide();
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
+        }
     }
 
     public void showError(String message, Exception error) {
@@ -44,7 +52,7 @@ public class BaseActivity extends AppCompatActivity  {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
-    private void runWithDelay(){
+    private void runWithDelay() {
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -59,6 +67,11 @@ public class BaseActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         Log.v(LOG_TAG, "onCreate started");
 
+    }
+
+    public void logout() {
+        DataManager.getInstance().getPreferencesManager().removeAuth();
+        startActivity(new Intent(this, LoginActivity.class));
     }
 
     @Override

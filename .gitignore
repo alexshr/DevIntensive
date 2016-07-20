@@ -6,7 +6,11 @@
 /build
 
 #build files
-/app/build
+/app/build/generated
+/app/build/intermediates
+/app/build/tmp
+/app/build/outputs/logs
+
 
 
 # Local configuration file (sdk path, etc)

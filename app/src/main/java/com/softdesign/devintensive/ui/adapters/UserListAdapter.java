@@ -19,6 +19,9 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * adapter for user info list
+ */
 public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserViewHolder> {
 
     private Context mContext;
@@ -103,9 +106,9 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
             userPhoto = (AspectRatioImageView) itemView.findViewById(R.id.user_photo_img);
             mFullName = (TextView) itemView.findViewById(R.id.user_full_name_txt);
-            mRating = (TextView) itemView.findViewById(R.id.rating_txt);
-            mCodeLines = (TextView) itemView.findViewById(R.id.code_lines_txt);
-            mProjects = (TextView) itemView.findViewById(R.id.projects_txt);
+            mRating = (TextView) itemView.findViewById(R.id.rating);
+            mCodeLines = (TextView) itemView.findViewById(R.id.lines);
+            mProjects = (TextView) itemView.findViewById(R.id.projects);
             mBio = (TextView) itemView.findViewById(R.id.bio_txt);
             mShowMore = (Button) itemView.findViewById(R.id.more_info_btn);
 
