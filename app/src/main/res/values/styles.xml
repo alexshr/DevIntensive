@@ -156,8 +156,9 @@
         <item name="android:textSize">@dimen/text_size_20</item>
     </style>
 
-
-
+    <style name="progress_screen">
+        <item name="android:fullDark">@android:color/transparent</item>
+    </style>
 
 
 </resources>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">НеШраго Александр</string>
+    <string name="app_name">Шраго Александр</string>
 
 
     <string name="header_rating">Рейтинг</string>
@@ -85,6 +85,9 @@
 
     <string name="auth_test_email">test@test.ru</string>
     <string name="auth_test_pass">test</string>
+    <string name="error_no_user_list">Не получен список пользователей</string>
+    <string name="enter_user_name">Введите имя пользователя</string>
+    <string name="splash_text">***DeveloperIntensive***</string>
 
 
 </resources>

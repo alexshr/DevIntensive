@@ -1,12 +1,26 @@
 package com.softdesign.devintensive.data.managers;
 
+import android.content.Context;
+
+import com.softdesign.devintensive.data.network.PicassoCache;
 import com.softdesign.devintensive.data.network.RestService;
 import com.softdesign.devintensive.data.network.ServiceGenerator;
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
 import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
+import com.softdesign.devintensive.data.storage.models.DaoSession;
+import com.softdesign.devintensive.data.storage.models.User;
+import com.softdesign.devintensive.data.storage.models.UserDao;
+import com.softdesign.devintensive.data.storage.models.UserOrder;
+import com.softdesign.devintensive.data.storage.models.UserOrderDao;
+import com.softdesign.devintensive.utils.DevApplication;
+import com.squareup.picasso.Picasso;
+
+import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -18,10 +32,20 @@ public class DataManager {
     private static DataManager INSTANCE;
     private PreferencesManager mPreferencesManager;
     private RestService mRestService;//rest service
+    private Context mContext;
+    private Picasso mPicasso;
+
+    private DaoSession mDaoSession;
+
 
     private DataManager() {
+        mContext = DevApplication.getContext();
         mPreferencesManager = new PreferencesManager();
-        this.mRestService = ServiceGenerator.createService(RestService.class);
+        mRestService = ServiceGenerator.createService(RestService.class);
+        mPicasso = new PicassoCache(mContext).getPicassoInstance();
+        mDaoSession = DevApplication.getDaoSession();
+
+
     }
 
     public static DataManager getInstance() {
@@ -29,6 +53,10 @@ public class DataManager {
             INSTANCE = new DataManager();
         }
         return INSTANCE;
+    }
+
+    public Picasso getPicasso() {
+        return mPicasso;
     }
 
     public PreferencesManager getPreferencesManager() {
@@ -70,7 +98,82 @@ public class DataManager {
      * rest api user list request
      * @return
      */
-    public Call<UserListRes> getUserList() {
+    public Call<UserListRes> getUserListFromNetwork() {
         return mRestService.getUserList();
     }
+
+    // region database
+
+    public DaoSession getDaoSession() {
+        return mDaoSession;
+    }
+
+
+    public List<User> getAllUserListOrderedByRatingFromDb() {
+        List<User> userList = new ArrayList<>();
+
+        try {
+            userList = mDaoSession.queryBuilder(User.class)
+                    .orderDesc(UserDao.Properties.Rating)
+                    .build()
+                    .list();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return userList;
+    }
+
+    public List<User> getUserListSortedByNameFromDb(String query) {
+
+        List<User> userList = new ArrayList<>();
+        try {
+            userList = mDaoSession.queryBuilder(User.class)
+                    .where(UserDao.Properties.Rating.gt(0),
+                            UserDao.Properties.SearchName.like("%" + query.toUpperCase() + "%"))
+//                    .orderDesc(UserDao.Properties.Rating)
+                    .build()
+                    .list();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return userList;
+    }
+
+    //сохраняем в базе порядковые номера всех пользователей
+    public void saveUserOrdersInDb(List<User> userList) {
+
+        try {
+            mDaoSession.getUserOrderDao().deleteAll();
+
+            for (int i = 0; i < userList.size(); i++) {
+                mDaoSession.getUserOrderDao().insertInTx(new UserOrder(userList.get(i).getRemoteId(), i));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public List<User> getUserOrderedListFromDb() {
+
+        List<User> userList = new ArrayList<>();
+        try {
+            QueryBuilder<User> queryBuilder = mDaoSession.queryBuilder(User.class);
+            queryBuilder.join(UserDao.Properties.RemoteId, UserOrder.class, UserOrderDao.Properties.UserRemoteId);
+            queryBuilder.where(UserDao.Properties.Rating.gt(0));
+            queryBuilder.orderRaw("USER_ORDER ASC");
+            queryBuilder.distinct();
+            userList = queryBuilder.list();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return userList;
+    }
+
+
+    // endregion
 }

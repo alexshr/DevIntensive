@@ -3,13 +3,12 @@ package com.softdesign.devintensive.ui.fragments;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-import com.softdesign.devintensive.data.network.res.UserListRes;
+import com.softdesign.devintensive.data.storage.models.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class UserListRetainFragment extends Fragment {
-    private List<UserListRes.UserData> mUsersList;
+    private List<User> mUserList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -18,11 +17,11 @@ public class UserListRetainFragment extends Fragment {
         setRetainInstance(true);
     }
 
-    public List<UserListRes.UserData> getUsersList() {
-        return mUsersList;
+    public List<User> getUserList() {
+        return mUserList;
     }
 
-    public void setUsersList(List<UserListRes.UserData> usersList) {
-        mUsersList = usersList;
+    public void setUserList(List<User> userList) {
+        mUserList = userList;
     }
 }
