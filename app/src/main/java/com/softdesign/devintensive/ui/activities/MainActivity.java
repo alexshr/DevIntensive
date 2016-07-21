@@ -235,7 +235,7 @@ public class MainActivity extends BaseActivity {
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
 
@@ -449,10 +449,11 @@ public class MainActivity extends BaseActivity {
     }
 
     private void placeProfilePicture(Uri selectedImage) {
+
         Picasso.with(this)
                 .load(selectedImage)
                 .resize(mProfileImageSize, mProfileImageSize)
-                //.centerInside()
+                .centerCrop()
                 .placeholder(R.drawable.user_bg)
                 .into(mUserPhotoImg);
 
@@ -489,7 +490,7 @@ public class MainActivity extends BaseActivity {
                         */
                         break;
                     case R.id.team:
-                        Intent intent = new Intent(MainActivity.this, UserListActivity.class) ;
+                        Intent intent = new Intent(MainActivity.this, UserListActivity.class);
                         startActivity(intent);
                         finish();
                         break;
@@ -518,11 +519,11 @@ public class MainActivity extends BaseActivity {
 
         //show user name and email
         TextView userNameView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_name);
-        String userName=mDataManager.getPreferencesManager().getUserName();
+        String userName = mDataManager.getPreferencesManager().getUserName();
         userNameView.setText(userName);
 
         TextView userEmailView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_email);
-        String email=mDataManager.getPreferencesManager().getEmail();
+        String email = mDataManager.getPreferencesManager().getEmail();
         userEmailView.setText(email);
 
 
@@ -588,8 +589,6 @@ public class MainActivity extends BaseActivity {
         mDataManager.getPreferencesManager().saveUserProfileData(userData);
 
     }
-
-
 
 
 }

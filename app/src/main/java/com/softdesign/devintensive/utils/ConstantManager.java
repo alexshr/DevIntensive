@@ -47,7 +47,5 @@ public interface ConstantManager {
     int REQUEST_GALLERY_PICTURE = 2;
 
 
-
-
-
+    String SORT_CRITERIA = "SORT_CRITERIA";
 }

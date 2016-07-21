@@ -21,22 +21,39 @@ public class BaseActivity extends AppCompatActivity {
     private static final String LOG_TAG = ConstantManager.LOG_TAG;
     protected ProgressDialog mProgressDialog;
 
-//worry about blocking activities home and back buttons!!!
+    //worry about blocking activities home and back buttons!!!
     public void showProgress() {
         if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this, R.layout.progress_splash);
+            mProgressDialog = new ProgressDialog(this, R.style.progress_screen);
             mProgressDialog.setCancelable(false);
             mProgressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            mProgressDialog.show();
-            mProgressDialog.setContentView(R.layout.progress_splash);
-        } else {
-            mProgressDialog.show();
-            mProgressDialog.setContentView(R.layout.progress_splash);
+
         }
-        //runWithDelay();
+        mProgressDialog.show();
+        mProgressDialog.setContentView(R.layout.progress_screen);
+
     }
 
+    public void showSplash() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this, R.style.progress_screen);
+            mProgressDialog.setCancelable(false);
+//            mProgressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        mProgressDialog.show();
+        mProgressDialog.setContentView(R.layout.splash_screen);
+    }
+
+
     public void hideProgress() {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
+        }
+    }
+
+    public void hideSplash() {
         if (mProgressDialog != null) {
             mProgressDialog.dismiss();
             mProgressDialog = null;

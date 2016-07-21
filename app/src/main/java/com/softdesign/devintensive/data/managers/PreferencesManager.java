@@ -32,7 +32,7 @@ public class PreferencesManager {
     };
 
     public PreferencesManager() {
-        mSharedPreferences = DevApplication.getSharedPreferences();
+        mSharedPreferences = DevApplication.sSharedPreferences;
     }
 
     public void saveUserProfileData(List<String> userFields) {
@@ -169,7 +169,7 @@ public class PreferencesManager {
      * @return
      */
     public String getAuthToken() {
-        return mSharedPreferences.getString(ConstantManager.AUTH_TOKEN_KEY, "null");
+        return mSharedPreferences.getString(ConstantManager.AUTH_TOKEN_KEY, "");
     }
 
     /**
@@ -218,4 +218,13 @@ public class PreferencesManager {
     }
 
 
+    public String getSortCriteria() {
+        return mSharedPreferences.getString(ConstantManager.SORT_CRITERIA, "");
+    }
+
+    public void saveSortCriteria(String sortCriteria) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.SORT_CRITERIA, sortCriteria);
+        editor.apply();
+    }
 }

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -15,21 +16,24 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.redmadrobot.chronos.ChronosConnector;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.managers.PreferencesManager;
 import com.softdesign.devintensive.data.network.res.UserListRes;
+import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
+import com.softdesign.devintensive.data.storage.tasks.LoadUserListFromDbTask;
 import com.softdesign.devintensive.ui.adapters.UserListAdapter;
 import com.softdesign.devintensive.ui.fragments.UserListRetainFragment;
 import com.softdesign.devintensive.utils.ConstantManager;
-import com.softdesign.devintensive.utils.NetworkStatusChecker;
 import com.softdesign.devintensive.utils.BorderedCircleTransform;
 import com.squareup.picasso.Picasso;
 
@@ -38,11 +42,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
-public class UserListActivity extends BaseActivity implements SearchView.OnQueryTextListener {
+public class UserListActivity extends BaseActivity {
 
     private static final String LOG_TAG = ConstantManager.LOG_TAG + "_UserListActivity";
 
@@ -70,19 +71,23 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 
     private UserListRetainFragment mRetainFragment;
 
-    //check if data is loaded
-    private boolean mIsListDataLoaded;
+    private final ChronosConnector mChronosConnector = new ChronosConnector();
+    private List<User> mUsers;
+    private int currTask;
+    private MenuItem mSearchMenuItem;
+    private PreferencesManager mPrefManager;
+    private String mSortCriteria;
+    private int mCurrTask;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list);
         ButterKnife.bind(this);
+        mChronosConnector.onCreate(this, savedInstanceState);
 
         mDataManager = DataManager.getInstance();
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
 
         setupToolBar();
         setupDrawer();
@@ -93,14 +98,118 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
             getSupportFragmentManager().beginTransaction().add(mRetainFragment, TAG_RETAIN_FRAGMENT).commit();
         }
 
-        //проверяем пришли ли по сети данные (а не в который раз activity открывается)
-        if (mRetainFragment.getUsersList() == null) {
-            loadUserList();
+
+        mSortCriteria = mDataManager.getPreferencesManager().getSortCriteria();
+        if (mRetainFragment.getUserList() == null) {
+            //проверяем наличие данных
+            //получаем полный список с выбранной сортировкой
+            //поток запускаем в chronos
+            mCurrTask = mChronosConnector.runOperation(
+                    new LoadUserListFromDbTask(null, mSortCriteria), false);
+
         } else {
-            setupUsersListAdapter(mRetainFragment.getUsersList());
+            mUsers = mRetainFragment.getUserList();
+
+
+            showUserList(mRetainFragment.getUserList());
         }
 
+
+        //layout manager
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+
+
+        //touch helper для swipe перемещения и удаления карточек
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                final int fromPos = viewHolder.getAdapterPosition();
+                final int toPos = target.getAdapterPosition();
+
+                mUsers.add(toPos, mUsers.remove(fromPos));
+                mUserListAdapter.notifyItemMoved(fromPos, toPos);
+
+                return true;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                mUsers.remove(position);
+                mUserListAdapter.notifyDataSetChanged();
+            }
+        });
+        itemTouchHelper.attachToRecyclerView(mRecyclerView);
+
     }
+
+
+    @Override
+    protected void onSaveInstanceState(@NonNull final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mChronosConnector.onSaveInstanceState(outState);
+        mRetainFragment.setUserList(mUsers);
+        mDataManager.saveUserOrdersInDb(mUsers);
+        if (mSortCriteria == null || mSortCriteria.equals("")) {
+            mPrefManager.saveSortCriteria(LoadUserListFromDbTask.SORTED_BY_USER_LIST);
+        } else {
+            mDataManager.getPreferencesManager().saveSortCriteria(mSortCriteria);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mChronosConnector.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        mChronosConnector.onPause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mDataManager.saveUserOrdersInDb(mUsers);
+        if (mSortCriteria == null || mSortCriteria.equals("")) {
+            mDataManager.getPreferencesManager().saveSortCriteria(LoadUserListFromDbTask.SORTED_BY_USER_LIST);
+        } else {
+            mDataManager.getPreferencesManager().saveSortCriteria(mSortCriteria);
+        }
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        mSearchMenuItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(mSearchMenuItem);
+        searchView.setQueryHint(getString(R.string.enter_user_name));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                //ввели новый символ - отменяем поиск и запускаем актуальный
+                if (mChronosConnector.isOperationRunning(currTask)) {
+                    mChronosConnector.cancelOperation(currTask, true);
+                }
+                currTask = mChronosConnector.runOperation(
+                        new LoadUserListFromDbTask(newText, LoadUserListFromDbTask.SEARCH_LIST), false);
+
+
+                return true;
+            }
+        });
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
 
     private void setupToolBar() {
         setSupportActionBar(mToolbar);
@@ -115,29 +224,10 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.user_list_toolbar, menu);
-
-        MenuItem searchItem = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(this);
-
+        getMenuInflater().inflate(R.menu.user_list, menu);
         return true;
     }
 
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-
-        return true;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        if (newText != null) {
-            final List<UserListRes.UserData> filteredModelList = filter(mRetainFragment.getUsersList(), newText);
-            mUserListAdapter.setFilter(filteredModelList);
-        }
-        return false;
-    }
 
     private List<UserListRes.UserData> filter(List<UserListRes.UserData> models, String query) {
         query = query.toLowerCase();
@@ -214,7 +304,8 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
         userEmailView.setText(email);
     }
 
-    private void setupUsersListAdapter(List<UserListRes.UserData> users) {
+    private void showUserList(List<User> users) {
+        mUsers = users;
         mUserListAdapter = new UserListAdapter(users, new UserListAdapter.UserViewHolder.UserItemClickListener() {
             @Override
             public void onUserItemClick(int adapterPosition) {
@@ -232,52 +323,16 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 
 
     /**
-     * fetch user list and load to retain fragment
+     * chronos
+     *
+     * @param result
      */
-    private void loadUserList() {
-        if (NetworkStatusChecker.isNetworkAvailable(this)) {
-
-            showProgress();
-
-            Call<UserListRes> call = mDataManager.getUserList();
-            call.enqueue(new Callback<UserListRes>() {
-                @Override
-                public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {
-                    if (response.code() == 200) {
-
-                        mRetainFragment.setUsersList(response.body().getData());
-                        setupUsersListAdapter(mRetainFragment.getUsersList());
-
-                    } else {
-                        showSnackbar("Не удалось получить данные с сервера: " + response.code());
-                    }
-                    hideProgress();
-                }
-
-                @Override
-                public void onFailure(Call<UserListRes> call, Throwable t) {
-                    showSnackbar("Ошибка: " + t.getMessage());
-                    hideProgress();
-                }
-            });
-
+    public void onOperationFinished(final LoadUserListFromDbTask.Result result) {
+        if (result.isSuccessful()) {
+            showUserList(result.getOutput());
         } else {
-            showSnackbar("Сеть на данный момент недоступна, попробуйте позже");
-
+            showSnackbar(result.getErrorMessage());
         }
     }
 
-    @Override
-    /**
-     * ProgressDialog у родителя блокирует кнопки drawer и назад
-     * поэтому переопределяем
-     */
-    public void showProgress() {
-        mProgressBar.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void hideProgress() {
-        mProgressBar.setVisibility(View.INVISIBLE);
-    }
 }
