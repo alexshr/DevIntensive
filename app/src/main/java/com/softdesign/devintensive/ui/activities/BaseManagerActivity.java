@@ -65,7 +65,7 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
 
             //сообщение об ошибке логина
             if (event.mes == MES_LOGIN_OR_PASSWORD_INCORRECT) {
-                showLoginError();
+                showLoginError(getResources().getString(R.string.error_login_password));
             }
 
         } else {
@@ -80,28 +80,42 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
             if (event.mes == MES_DATA_LOADED) {
                 hideSplash();
                 hideProgress();
+                showData();
                 showInfo("данные успешно обновлены с сервера");
             }
 
             //отображаем локальные данные - от сети взяли что могли
-            if (event.mes == MES_NETWORK_NOT_AVAILABLE
-                    || event.mes == MES_RESPONSE_ERROR
-                    || event.mes == MES_SERVER_ERROR
-                    || event.mes == MES_DATA_LOADED) {
-                showData();
-            }
+
 
             //show error
             if (event.mes == MES_NETWORK_NOT_AVAILABLE) {
-                showError(getResources().getString(R.string.error_no_network));
-            } else if (event.mes == MES_RESPONSE_ERROR) {
-                showError(getResources().getString(R.string.error_server));
-            } else if (event.mes == MES_SERVER_ERROR) {
-                showError(getResources().getString(R.string.error_server));
+                if (sIsUserChecked) {
+                    showData();
+                    showError(getResources().getString(R.string.error_no_network));
+                } else {
+                    //форма логина блокирует экран - сообщения туда выводим
+                    showLoginDialog();
+                    mLoginFragment.showError(getResources().getString(R.string.error_no_network));
+                }
+
+            } else if (event.mes == MES_RESPONSE_ERROR || event.mes == MES_SERVER_ERROR) {
+
+                if (sIsUserChecked) {
+                    showData();
+                    showError(getResources().getString(R.string.error_server));
+                } else {
+                    showLoginDialog();
+                    mLoginFragment.showError(getResources().getString(R.string.error_server));
+                }
             }
         }
     }
 
+    private void showLoginError(String mes) {
+        Log.d(LOG_TAG, "showLoginError mLoginFragment=" + mLoginFragment);
+        showLoginDialog();
+        mLoginFragment.showError(mes);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,14 +193,6 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
         if (mLoginFragment == null) {
             mLoginFragment = new LoginFragment();
             mLoginFragment.show(getSupportFragmentManager(), TAG_LOGIN_FRAGMENT);
-        }
-    }
-
-    public void showLoginError() {
-        Log.d(LOG_TAG, "showLoginError mLoginFragment=" + mLoginFragment);
-
-        if (mLoginFragment != null) {
-            mLoginFragment.showError();
         }
     }
 

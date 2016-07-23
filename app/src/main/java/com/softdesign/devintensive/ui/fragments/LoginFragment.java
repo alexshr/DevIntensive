@@ -115,8 +115,9 @@ public class LoginFragment extends DialogFragment {
     /**
      * показать сообщение об ошибке
      */
-    public void showError() {
-        Utils.showErrorOnSnackBar(mCoordinatorLayout,getResources().getString(R.string.error_login_password));
+    public void showError(String mes) {
+
+        Utils.showErrorOnSnackBar(mCoordinatorLayout,mes);
 
     }
 

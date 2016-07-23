@@ -267,6 +267,8 @@ public class HostProfileActivity extends BaseManagerActivity {
 
         // photo from server
         placeProfilePicture(mDataManager.getPreferencesManager().getPhotoUri());
+
+        hideProgress();
     }
 
     @Override
