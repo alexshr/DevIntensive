@@ -33,6 +33,8 @@ public interface ConstantManager {
 
 
 
+
+
     //Dialog constants
     int LOAD_PROFILE_PHOTO = 1;
 
@@ -47,5 +49,9 @@ public interface ConstantManager {
     int REQUEST_GALLERY_PICTURE = 2;
 
 
+
     String SORT_CRITERIA = "SORT_CRITERIA";
+
+
+
 }

@@ -47,25 +47,23 @@ public class PreferencesManager {
 
     public String getUserName() {
 
-        String firstName=mSharedPreferences.getString(ConstantManager.USER_FIRST_NAME, " ");
-        String secondName=mSharedPreferences.getString(ConstantManager.USER_SECOND_NAME, " ");
-        return secondName+" "+firstName;
+        String firstName = mSharedPreferences.getString(ConstantManager.USER_FIRST_NAME, " ");
+        String secondName = mSharedPreferences.getString(ConstantManager.USER_SECOND_NAME, " ");
+        return secondName + " " + firstName;
     }
-
-
 
 
 
     public String getLogin() {
-        return mSharedPreferences.getString(ConstantManager.USER_LOGIN_KEY,"");
+        return mSharedPreferences.getString(ConstantManager.USER_LOGIN_KEY, "");
     }
 
     public String getPassword() {
-        return mSharedPreferences.getString(ConstantManager.USER_PASS_KEY,"");
+        return mSharedPreferences.getString(ConstantManager.USER_PASS_KEY, "");
     }
 
     public String getEmail() {
-        return mSharedPreferences.getString(ConstantManager.USER_MAIL_KEY,"");
+        return mSharedPreferences.getString(ConstantManager.USER_MAIL_KEY, "");
     }
 
     /**
@@ -136,12 +134,6 @@ public class PreferencesManager {
 
 
 
-/*
-    public Uri getPhotoLocalUri() {
-        return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_PHOTO_LOCAL_URI,
-                ""));
-    }
-*/
     public Uri getPhotoUri() {
         return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_PHOTO_URI,
                 ""));
@@ -183,7 +175,7 @@ public class PreferencesManager {
         editor.apply();
     }
 
-//to login automatically
+    //to login automatically
     public void saveLogin(String login) {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString(ConstantManager.USER_LOGIN_KEY, login);
@@ -197,7 +189,6 @@ public class PreferencesManager {
     }
 
 
-
     /**
      * fetch userId
      *
@@ -207,13 +198,18 @@ public class PreferencesManager {
         return mSharedPreferences.getString(ConstantManager.USER_ID_KEY, "null");
     }
 
-    //clean auth
-    public void removeAuth() {
+
+    public void removeTokenAndKey() {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.USER_ID_KEY, "");
+        editor.putString(ConstantManager.AUTH_TOKEN_KEY, "");
+        editor.apply();
+    }
+
+    public void removeLoginAndPass() {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString(ConstantManager.USER_PASS_KEY, "");
         editor.putString(ConstantManager.USER_LOGIN_KEY, "");
-        editor.putString(ConstantManager.USER_ID_KEY, "");
-        editor.putString(ConstantManager.AUTH_TOKEN_KEY, "");
         editor.apply();
     }
 

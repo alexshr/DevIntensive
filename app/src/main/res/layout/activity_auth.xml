@@ -24,11 +24,11 @@
 
 
         <RelativeLayout
+            android:id="@+id/auth_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:id="@+id/auth_layout"
-            android:visibility="invisible"
+
             android:background="@android:color/white">
 
 
@@ -129,21 +129,19 @@
                 />
 
 
-
         </RelativeLayout>
 
         <ProgressBar
+            android:id="@+id/progress"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
 
-            android:id="@+id/progress"
+            android:layout_gravity="center"
             android:visibility="visible"
             />
 
     </FrameLayout>
-
 
 
 </android.support.design.widget.CoordinatorLayout>

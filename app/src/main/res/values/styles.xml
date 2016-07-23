@@ -113,6 +113,13 @@
         <item name="android:fontFamily" tools:targetApi="jelly_bean">@string/font_condensed</item>
     </style>
 
+    <!--for fullscreen login fragment-->
+    <style name="fragment_fullscreen"  >
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
 
     <!--for user_profile-->
     <style name="outer_line_layout_element">

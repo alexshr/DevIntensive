@@ -28,11 +28,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -40,9 +39,12 @@ import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.managers.PreferencesManager;
+import com.softdesign.devintensive.services.DownloadDataService;
 import com.softdesign.devintensive.ui.views.ValidatedTextInputLayout;
 import com.softdesign.devintensive.utils.BorderedCircleTransform;
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.softdesign.devintensive.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -69,7 +71,7 @@ import static com.softdesign.devintensive.utils.Utils.createImageFile;
  * окно профиля залогинившегося пользователя
  * вся логика работы полей ввода, включая валидацию, подсказки и пр перенесены в custom view
  */
-public class MainActivity extends BaseActivity {
+public class HostProfileActivity extends BaseManagerActivity {
 
 
     private static String LOG_TAG = ConstantManager.LOG_TAG;
@@ -137,6 +139,7 @@ public class MainActivity extends BaseActivity {
 
 
     private DataManager mDataManager = DataManager.getInstance();
+    private PreferencesManager mPrefManager = mDataManager.getPreferencesManager();
 
     //file from camera
     private File mPhotoFile = null;
@@ -156,7 +159,7 @@ public class MainActivity extends BaseActivity {
                         //all is valid
                         saveUserInfo();
                         mIsEditMode = !mIsEditMode;
-                        mAppBarLayout.setExpanded(false);
+                        //mAppBarLayout.setExpanded(false);
                     }
                 } else {
                     mIsEditMode = !mIsEditMode;
@@ -185,15 +188,6 @@ public class MainActivity extends BaseActivity {
                 break;
         }
     }
-
-
-    /**
-     * validate
-     */
-    private boolean validateInput() {
-        return getFirstErrorInput() == null;
-    }
-
 
     /**
      * determine first error field
@@ -240,6 +234,8 @@ public class MainActivity extends BaseActivity {
         }
 
         setContentView(R.layout.activity_main);
+
+
         ButterKnife.bind(this);
 
 
@@ -247,20 +243,54 @@ public class MainActivity extends BaseActivity {
 
         setupDrawer();
 
+
         if (savedInstanceState != null) {
             // recreating activity
             mIsEditMode = savedInstanceState.getBoolean(ConstantManager.EDIT_MODE_KEY, false);
             //loadUserInfoValue();
-        } else {
-            // first starting of the activity
-            loadUserInfoValue();
+        }
+    }
+
+    @Override
+    public void showData() {
+        Log.d(LOG_TAG, "showData started");
+        List<String> userData = mDataManager.getPreferencesManager().loadUserProfileData();
+        for (int i = 0; i < userData.size(); i++) {
+            mEditLayoutList.get(i).setText(userData.get(i));
         }
 
+        userData = mDataManager.getPreferencesManager().loadUserProfileValues();
+        for (int i = 0; i < userData.size(); i++) {
+            mValueList.get(i).setText(userData.get(i));
+        }
         prepareViewsForMode();
 
         // photo from server
         placeProfilePicture(mDataManager.getPreferencesManager().getPhotoUri());
+    }
 
+    @Override
+    public void showError(String mes) {
+        Utils.showErrorOnSnackBar(mCoordinatorLayout, mes);
+    }
+
+    @Override
+    public void showInfo(String mes) {
+        Utils.showInfoOnSnackBar(mCoordinatorLayout, mes);
+    }
+
+
+    @Override
+    public void downloadData() {
+        Log.d(LOG_TAG, "downloadData started");
+        super.downloadData();
+        if (mPrefManager.getLogin().isEmpty()) {
+            //отправляемся спрашивать у пользователя логин и пароль
+            postEvent(DownloadDataService.MES_LOGIN_OR_PASSWORD_ABSENT);
+        } else {
+            //идем за профайлом и токеном
+            DownloadDataService.startActionTokenAndProfile(this, mPrefManager.getLogin(), mPrefManager.getPassword());
+        }
     }
 
     @Override
@@ -293,10 +323,18 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.host_profile, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             mNavigationDrawer.openDrawer(GravityCompat.START);
             return true;
+        } else if (item.getItemId() == R.id.refresh) {
+            downloadData();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -322,6 +360,7 @@ public class MainActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         switch (requestCode) {
+
             case REQUEST_GALLERY_PICTURE:
                 if (resultCode == RESULT_OK && data != null) {
                     mPhotoUri = data.getData();
@@ -330,7 +369,7 @@ public class MainActivity extends BaseActivity {
                     placeProfilePicture(mPhotoUri);
                     uploadImageFile(new File(getPath(mPhotoUri)));
                 }
-                break;
+                return;
             case REQUEST_CAMERA_PICTURE:
                 if (resultCode == RESULT_OK && mPhotoFile != null) {
                     mPhotoUri = Uri.fromFile(mPhotoFile);
@@ -340,19 +379,21 @@ public class MainActivity extends BaseActivity {
                     uploadImageFile(new File(mPhotoUri.getPath()));
 
                 }
-                break;
+                return;
             case REQUEST_PERMISSIONS_CAMERA_SETTINGS:
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
                         ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                     loadPhotoFromCamera();
                 }
-                break;
+                return;
             case REQUEST_PERMISSIONS_READ_SDCARD_SETTINGS:
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                     loadPhotoFromGallery();
                 }
-                break;
+                return;
+
         }
+
     }
 
     /**
@@ -459,11 +500,6 @@ public class MainActivity extends BaseActivity {
 
     }
 
-
-    private void showSnackBar(String message) {
-        Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG).show();
-    }
-
     private void setupToolbar() {
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -482,23 +518,14 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.profile:
-                        /*
-                        Intent intent = new Intent(UserListActivity.this, UserListActivity.class) ;
-                        startActivity(intent);
-                        finish();
-                        */
-                        break;
                     case R.id.team:
-                        Intent intent = new Intent(MainActivity.this, UserListActivity.class);
+                        Intent intent = new Intent(HostProfileActivity.this, UserListActivity.class);
                         startActivity(intent);
                         finish();
                         break;
                     case R.id.logout:
                         logout();
                         break;
-
-
                 }
                 item.setChecked(true);
                 mNavigationDrawer.closeDrawer(GravityCompat.START);
@@ -569,17 +596,6 @@ public class MainActivity extends BaseActivity {
         requestFocus();
     }
 
-    private void loadUserInfoValue() {
-        List<String> userData = mDataManager.getPreferencesManager().loadUserProfileData();
-        for (int i = 0; i < userData.size(); i++) {
-            mEditLayoutList.get(i).setText(userData.get(i));
-        }
-
-        userData = mDataManager.getPreferencesManager().loadUserProfileValues();
-        for (int i = 0; i < userData.size(); i++) {
-            mValueList.get(i).setText(userData.get(i));
-        }
-    }
 
     private void saveUserInfo() {
         List<String> userData = new ArrayList<>();

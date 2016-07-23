@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,7 +31,7 @@ import static com.softdesign.devintensive.utils.Utils.setListViewHeightBasedOnCh
 /**
  * окно данных пользователя выбранного из списка
  */
-public class ProfileUserActivity extends BaseActivity {
+public class ProfileUserActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;

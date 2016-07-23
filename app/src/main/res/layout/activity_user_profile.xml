@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            tools:context=".ui.activities.MainActivity">
+            tools:context=".ui.activities.HostProfileActivity">
 
             <include layout="@layout/user_profile"/>
 

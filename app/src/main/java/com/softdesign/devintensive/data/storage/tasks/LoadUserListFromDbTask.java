@@ -35,7 +35,7 @@ public class LoadUserListFromDbTask extends ChronosOperation<List<User>> {
     public List<User> run() {
         final List<User> res;
 
-        Log.e(LOG_TAG, "LoadUserListFromDbTask run crit=" + mCrit);
+        Log.d(LOG_TAG, "LoadUserListFromDbTask run crit=" + mCrit);
         if (mCrit.isEmpty()) {
             res = DataManager.getInstance().getAllUserListOrderedByRatingFromDb();
         } else {
@@ -46,6 +46,7 @@ public class LoadUserListFromDbTask extends ChronosOperation<List<User>> {
 
                 case SORTED_BY_USER_LIST:
                     res = DataManager.getInstance().getUserOrderedListFromDb();
+
                     break;
 
                 default:

@@ -27,9 +27,9 @@ public class DevApplication extends Application {
         sSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 
-       DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "devintensive-db");
-       Database db = helper.getWritableDb();
-       sDaoSession = new DaoMaster(db).newSession();
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "devintensive-db");
+        Database db = helper.getWritableDb();
+        sDaoSession = new DaoMaster(db).newSession();
 
         //для отладки
         Stetho.initializeWithDefaults(this);

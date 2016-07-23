@@ -8,7 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.softdesign.devintensive.ui.activities.MainActivity">
+    tools:context=".ui.activities.HostProfileActivity">
 
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/main_coordinator_container"
@@ -58,7 +58,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                tools:context=".ui.activities.MainActivity">
+                tools:context=".ui.activities.HostProfileActivity">
 
                 <include layout="@layout/user_info"/>
 

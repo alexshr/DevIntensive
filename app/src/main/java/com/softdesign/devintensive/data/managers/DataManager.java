@@ -1,6 +1,7 @@
 package com.softdesign.devintensive.data.managers;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.softdesign.devintensive.data.network.PicassoCache;
 import com.softdesign.devintensive.data.network.RestService;
@@ -13,6 +14,7 @@ import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDao;
 import com.softdesign.devintensive.data.storage.models.UserOrder;
 import com.softdesign.devintensive.data.storage.models.UserOrderDao;
+import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.DevApplication;
 import com.squareup.picasso.Picasso;
 
@@ -131,11 +133,11 @@ public class DataManager {
             userList = mDaoSession.queryBuilder(User.class)
                     .where(UserDao.Properties.Rating.gt(0),
                             UserDao.Properties.SearchName.like("%" + query.toUpperCase() + "%"))
-//                    .orderDesc(UserDao.Properties.Rating)
+                    .orderDesc(UserDao.Properties.Rating)
                     .build()
                     .list();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(ConstantManager.LOG_TAG,"getUserListSortedByNameFromDb",e);
         }
 
         return userList;
@@ -151,7 +153,7 @@ public class DataManager {
                 mDaoSession.getUserOrderDao().insertInTx(new UserOrder(userList.get(i).getRemoteId(), i));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(ConstantManager.LOG_TAG,"saveUserOrdersInDb",e);
         }
     }
 
@@ -168,7 +170,7 @@ public class DataManager {
             userList = queryBuilder.list();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(ConstantManager.LOG_TAG,"getUserOrderedListFromDb",e);
         }
 
         return userList;
