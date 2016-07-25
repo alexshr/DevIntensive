@@ -18,6 +18,7 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
 
+
     <!--for icons-->
     <style name="user_info_icon">
         <item name="android:layout_width">wrap_content</item>
@@ -114,7 +115,7 @@
     </style>
 
     <!--for fullscreen login fragment-->
-    <style name="fragment_fullscreen"  >
+    <style name="fragment_fullscreen">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowIsFloating">false</item>

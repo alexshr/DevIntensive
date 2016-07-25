@@ -199,20 +199,18 @@ public class PreferencesManager {
     }
 
 
-    public void removeTokenAndKey() {
+    public void removeAuth() {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString(ConstantManager.USER_ID_KEY, "");
         editor.putString(ConstantManager.AUTH_TOKEN_KEY, "");
-        editor.apply();
-    }
-
-    public void removeLoginAndPass() {
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString(ConstantManager.USER_PASS_KEY, "");
         editor.putString(ConstantManager.USER_LOGIN_KEY, "");
         editor.apply();
     }
 
+    public boolean hasTokenOrLogin(){
+        return getAuthToken().isEmpty()&&getLogin().isEmpty();
+    }
 
     public String getSortCriteria() {
         return mSharedPreferences.getString(ConstantManager.SORT_CRITERIA, "");

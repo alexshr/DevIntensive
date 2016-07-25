@@ -233,7 +233,7 @@ public class HostProfileActivity extends BaseManagerActivity {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_host_profile);
 
 
         ButterKnife.bind(this);
@@ -254,6 +254,7 @@ public class HostProfileActivity extends BaseManagerActivity {
     @Override
     public void showData() {
         Log.d(LOG_TAG, "showData started");
+        super.showData();
         List<String> userData = mDataManager.getPreferencesManager().loadUserProfileData();
         for (int i = 0; i < userData.size(); i++) {
             mEditLayoutList.get(i).setText(userData.get(i));
@@ -268,16 +269,16 @@ public class HostProfileActivity extends BaseManagerActivity {
         // photo from server
         placeProfilePicture(mDataManager.getPreferencesManager().getPhotoUri());
 
-        hideProgress();
+        postEvent(MES_SHOW_FINISHED);
     }
 
     @Override
-    public void showError(String mes) {
+    public void showErrorMes(String mes) {
         Utils.showErrorOnSnackBar(mCoordinatorLayout, mes);
     }
 
     @Override
-    public void showInfo(String mes) {
+    public void showInfoMes(String mes) {
         Utils.showInfoOnSnackBar(mCoordinatorLayout, mes);
     }
 
@@ -288,7 +289,7 @@ public class HostProfileActivity extends BaseManagerActivity {
         super.downloadData();
         if (mPrefManager.getLogin().isEmpty()) {
             //отправляемся спрашивать у пользователя логин и пароль
-            postEvent(DownloadDataService.MES_LOGIN_OR_PASSWORD_ABSENT);
+            postEvent(BaseManagerActivity.MES_USER_NOT_AUTHORIZED);
         } else {
             //идем за профайлом и токеном
             DownloadDataService.startActionTokenAndProfile(this, mPrefManager.getLogin(), mPrefManager.getPassword());

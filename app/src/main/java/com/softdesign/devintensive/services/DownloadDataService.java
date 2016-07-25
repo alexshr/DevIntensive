@@ -14,6 +14,7 @@ import com.softdesign.devintensive.data.storage.models.Repository;
 import com.softdesign.devintensive.data.storage.models.RepositoryDao;
 import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDao;
+import com.softdesign.devintensive.ui.activities.BaseManagerActivity;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.MessageEvent;
 import com.softdesign.devintensive.utils.NetworkStatusChecker;
@@ -35,16 +36,6 @@ import retrofit2.Response;
  * helper methods.
  */
 public class DownloadDataService extends IntentService {
-    //messages
-    public static final String MES_NETWORK_NOT_AVAILABLE = "MES_NETWORK_NOT_AVAILABLE";
-    public static final String MES_DATA_LOADED = "MES_DATA_LOADED";
-
-    public static final String MES_USER_NOT_AUTHORIZED = "MES_USER_NOT_AUTHORIZED";
-    public static final String MES_RESPONSE_ERROR = "MES_RESPONSE_ERROR";
-    public static final String MES_SERVER_ERROR = "MES_SERVER_ERROR";
-    public static final String MES_LOGIN_OR_PASSWORD_INCORRECT = "MES_LOGIN_OR_PASSWORD_INCORRECT";
-    public static final String MES_LOGIN_OR_PASSWORD_ABSENT = "MES_LOGIN_OR_PASSWORD_ABSENT";
-    public static final String MES_AUTHORIZATED = "MES_AUTHORIZATED";
 
 
     String LOG_TAG = ConstantManager.LOG_TAG;
@@ -117,21 +108,21 @@ public class DownloadDataService extends IntentService {
             if (ACTION_TOKEN_AND_PROFILE.equals(action)) {
                 //идем за токеном и профилем
                 if (loadTokenAndProfile(login, pass)) {
-                    EventBus.getDefault().post(new MessageEvent(MES_AUTHORIZATED));
-                    EventBus.getDefault().post(new MessageEvent(MES_DATA_LOADED));
+                    EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_AUTHORIZATED));
+                    EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_DOWNLOAD_FINISHED));
                 }
             } else if (ACTION_USER_LIST.equals(action)) {
                 if (login == null) {
                     //пароль не прислали - значит сразу идем за списком
                     if (loadUserListFromServerAndSaveInDb()) {
-                        EventBus.getDefault().post(new MessageEvent(MES_DATA_LOADED));
+                        EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_DOWNLOAD_FINISHED));
                     }
                 } else {
                     //прислали пароль - сначала авторизуемся
                     if (loadTokenAndProfile(login, pass)) {
-                        EventBus.getDefault().post(new MessageEvent(MES_AUTHORIZATED));
+                        EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_AUTHORIZATED));
                         if (loadUserListFromServerAndSaveInDb()) {
-                            EventBus.getDefault().post(new MessageEvent(MES_DATA_LOADED));
+                            EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_DOWNLOAD_FINISHED));
                         }
                     }
                 }
@@ -143,7 +134,7 @@ public class DownloadDataService extends IntentService {
     private boolean loadTokenAndProfile(String login, String pass) {
 
         if (!NetworkStatusChecker.isNetworkAvailable(this)) {
-            EventBus.getDefault().post(new MessageEvent(MES_NETWORK_NOT_AVAILABLE));
+            EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_NETWORK_NOT_AVAILABLE));
             return false;
         }
 
@@ -162,15 +153,15 @@ public class DownloadDataService extends IntentService {
             } else {
 
                 if (response.code() == 404) {
-                    EventBus.getDefault().post(new MessageEvent(MES_LOGIN_OR_PASSWORD_INCORRECT));
+                    EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_LOGIN_OR_PASSWORD_INCORRECT));
                 } else {
 
-                    EventBus.getDefault().post(new MessageEvent(MES_RESPONSE_ERROR));
+                    EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_RESPONSE_ERROR));
                 }
                 return false;
             }
         } catch (IOException e) {
-            EventBus.getDefault().post(new MessageEvent(MES_SERVER_ERROR));
+            EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_SERVER_ERROR));
             return false;
         }
 
@@ -184,7 +175,7 @@ public class DownloadDataService extends IntentService {
 
 
         if (!NetworkStatusChecker.isNetworkAvailable(this)) {
-            EventBus.getDefault().post(new MessageEvent(MES_NETWORK_NOT_AVAILABLE));
+            EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_NETWORK_NOT_AVAILABLE));
             return false;
         }
 
@@ -208,16 +199,16 @@ public class DownloadDataService extends IntentService {
                 return true;
 
             } else if (response.code() == 401) {
-                EventBus.getDefault().post(new MessageEvent(MES_USER_NOT_AUTHORIZED));
+                EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_USER_NOT_AUTHORIZED));
                 return false;
             } else {
                 Log.e(LOG_TAG, "Network error: " + response.message());
-                EventBus.getDefault().post(new MessageEvent(MES_RESPONSE_ERROR));
+                EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_RESPONSE_ERROR));
                 return false;
             }
         } catch (IOException e) {
             Log.e(LOG_TAG, "Network failure: ", e);
-            EventBus.getDefault().post(new MessageEvent(MES_SERVER_ERROR));
+            EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_SERVER_ERROR));
             return false;
         }
     }

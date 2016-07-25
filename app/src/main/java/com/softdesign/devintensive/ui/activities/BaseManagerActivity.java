@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
@@ -20,107 +19,149 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import static com.softdesign.devintensive.services.DownloadDataService.MES_AUTHORIZATED;
-import static com.softdesign.devintensive.services.DownloadDataService.MES_DATA_LOADED;
-import static com.softdesign.devintensive.services.DownloadDataService.MES_LOGIN_OR_PASSWORD_ABSENT;
-import static com.softdesign.devintensive.services.DownloadDataService.MES_LOGIN_OR_PASSWORD_INCORRECT;
-import static com.softdesign.devintensive.services.DownloadDataService.MES_NETWORK_NOT_AVAILABLE;
-import static com.softdesign.devintensive.services.DownloadDataService.MES_RESPONSE_ERROR;
-import static com.softdesign.devintensive.services.DownloadDataService.MES_SERVER_ERROR;
-import static com.softdesign.devintensive.services.DownloadDataService.MES_USER_NOT_AUTHORIZED;
-
 /**
  * умеет только выводить неудачный диалог(
  */
 public abstract class BaseManagerActivity extends AppCompatActivity implements LoginFragment.OnSubmitListener {
+
+    public static final long SPLASH_DURATION = 2000L;
+
+    //messages
+    public static final String MES_NETWORK_NOT_AVAILABLE = "MES_NETWORK_NOT_AVAILABLE";
+    public static final String MES_USER_NOT_AUTHORIZED = "MES_USER_NOT_AUTHORIZED";
+    public static final String MES_RESPONSE_ERROR = "MES_RESPONSE_ERROR";
+    public static final String MES_SERVER_ERROR = "MES_SERVER_ERROR";
+    public static final String MES_LOGIN_OR_PASSWORD_INCORRECT = "MES_LOGIN_OR_PASSWORD_INCORRECT";
+
+    //запросу на профайл всегда нужен логин и пароль (токен не интересен)
+    //public static final String MES_LOGIN_OR_PASSWORD_ABSENT = "MES_LOGIN_OR_PASSWORD_ABSENT";
+
+    public static final String MES_AUTHORIZATED = "MES_AUTHORIZATED";
+
+    //получение и сохранение данных из сети
+    public static final String MES_DOWNLOAD_STARTED = "MES_DOWNLOAD_STARTED";
+    public static final String MES_DOWNLOAD_FINISHED = "MES_DOWNLOAD_FINISHED";
+
+    //отображение локальных данных
+    public static final String MES_SHOW_STARTED = "MES_SHOW_STARTED";
+    public static final String MES_SHOW_FINISHED = "MES_SHOW_FINISHED";
+
+    private static final String MES_LOGOUT = "MES_LOGOUT";
+
+
     private static final String TAG_LOGIN_FRAGMENT = "TAG_LOGIN_FRAGMENT";
-    private static final String KEY_IS_AUTH_CHECKED = "KEY_IS_AUTH_CHECKED";
     protected ProgressDialog mProgressDialog;
 
     private LoginFragment mLoginFragment;
     private PreferencesManager mPrefManager;
 
-    //флаг проверки авторизации
-    private static boolean sIsUserChecked;
+    private Handler uiHandler = new Handler();
 
-    private String LOG_TAG = ConstantManager.LOG_TAG + "_BaseActivity";
+
+    //стартует ли впервые - для splash
+    private static boolean sIsFirstStart = true;
+
+    //нужно ли проверять авторизацию
+    private static boolean sIsAuthChecked;
+
+
+    private static String LOG_TAG = ConstantManager.LOG_TAG + "_BaseActivity";
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
         Log.d(LOG_TAG, "onMessageEvent " + event.mes);
 
-        if (event.mes == MES_USER_NOT_AUTHORIZED
-                || event.mes == MES_LOGIN_OR_PASSWORD_ABSENT
-                || event.mes == MES_LOGIN_OR_PASSWORD_INCORRECT
-                ) {
+        switch (event.mes) {
+            case MES_USER_NOT_AUTHORIZED:
+            case MES_LOGOUT:
 
-            //удаляем токен,логин..
-            mPrefManager.removeTokenAndKey();
-            mPrefManager.removeLoginAndPass();
-
-            //показываем диалог авторизации
-            hideProgress();
-            showLoginDialog();
-
-            //сообщение об ошибке логина
-            if (event.mes == MES_LOGIN_OR_PASSWORD_INCORRECT) {
-                showLoginError(getResources().getString(R.string.error_login_password));
-            }
-
-        } else {
-
-            //закрываем форму ввода
-            if (event.mes == MES_AUTHORIZATED
-                    || event.mes == MES_DATA_LOADED) {
-                dismissLoginFragment();
-                sIsUserChecked = true;
-            }
-
-            if (event.mes == MES_DATA_LOADED) {
-                hideSplash();
+                //удаляем токен,логин..
+                mPrefManager.removeAuth();
+                sIsAuthChecked = false;
+                //показываем диалог авторизации
+                showLoginDialog();
                 hideProgress();
+
+
+                if (sIsFirstStart) {
+                    sIsFirstStart = false;
+                    uiHandler.postDelayed(new Runnable() {
+                        //убираем splash c задержкой, чтобы не мигало при смене экрана
+                        @Override
+                        public void run() {
+                            hideSplash();
+                        }
+                    }, 300);
+                }
+                break;
+
+            case MES_LOGIN_OR_PASSWORD_INCORRECT:
+                //показываем ошибку на форме авториз.
+                showLoginDialog();
+                showError(getString(R.string.error_login_password));
+                break;
+
+            case MES_AUTHORIZATED:
+                sIsAuthChecked = true;
+                dismissLoginFragment();
+                break;
+
+            case MES_DOWNLOAD_STARTED:
+                if (sIsFirstStart) {
+                    hideSplash();
+                    sIsFirstStart = false;
+                }
+                showProgress();
+                break;
+
+            case MES_DOWNLOAD_FINISHED:
                 showData();
-                showInfo("данные успешно обновлены с сервера");
-            }
+                showInfoMes(getString(R.string.success_refresh));
+                break;
 
-            //отображаем локальные данные - от сети взяли что могли
+            case MES_NETWORK_NOT_AVAILABLE:
+                hideProgress();
+                showError(getString(R.string.error_no_network));
+                showData();
+                break;
 
+            case MES_RESPONSE_ERROR:
+            case MES_SERVER_ERROR:
+                hideProgress();
+                showError(getString(R.string.error_server));
+                showData();
+                break;
 
-            //show error
-            if (event.mes == MES_NETWORK_NOT_AVAILABLE) {
-                if (sIsUserChecked) {
-                    showData();
-                    showError(getResources().getString(R.string.error_no_network));
-                } else {
-                    //форма логина блокирует экран - сообщения туда выводим
-                    showLoginDialog();
-                    mLoginFragment.showError(getResources().getString(R.string.error_no_network));
-                }
+            case MES_SHOW_STARTED:
+                showProgress();
+                break;
 
-            } else if (event.mes == MES_RESPONSE_ERROR || event.mes == MES_SERVER_ERROR) {
+            case MES_SHOW_FINISHED:
+                hideProgress();
+                break;
 
-                if (sIsUserChecked) {
-                    showData();
-                    showError(getResources().getString(R.string.error_server));
-                } else {
-                    showLoginDialog();
-                    mLoginFragment.showError(getResources().getString(R.string.error_server));
-                }
-            }
         }
     }
 
-    private void showLoginError(String mes) {
-        Log.d(LOG_TAG, "showLoginError mLoginFragment=" + mLoginFragment);
-        showLoginDialog();
-        mLoginFragment.showError(mes);
+
+    private void showError(String mes) {
+        if (mLoginFragment == null) {
+            showErrorMes(mes);
+        } else {
+            //форма логина блокирует экран - сообщения туда выводим
+            mLoginFragment.showError(mes);
+
+        }
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.v(LOG_TAG, "onCreate started");
+
+
         mPrefManager = DataManager.getInstance().getPreferencesManager();
     }
 
@@ -129,19 +170,32 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
     protected void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
-        Log.v(LOG_TAG, "onPause started mIsAuthChecked=" + sIsUserChecked);
+        Log.d(LOG_TAG, "onStart started sIsFirstStart=" + sIsFirstStart + " sIsAuthChecked=" + sIsAuthChecked);
 
-        if (!sIsUserChecked) {
-
-            //чтобы проверить авторизацию заодно загрузим свежие данные
-            //пока не подтвердится авторизация - пользователь лок данных не увидит
-            downloadData();
-
+        //пока не подтвердится авторизация - пользователь лок данных не увидит
+        if (sIsFirstStart) {
+            //держим splash
+            showSplash();
+            uiHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    //hideSplash();
+                    if (mPrefManager.hasTokenOrLogin()) {
+                        postEvent(MES_USER_NOT_AUTHORIZED);
+                    } else {
+                        downloadData();
+                    }
+                }
+            }, SPLASH_DURATION);
         } else {
-            //смотрим локальные данные
-            //теперь на сервер - только по refresh  ользователя
-            showData();
+            if (mPrefManager.hasTokenOrLogin()) {
+                postEvent(MES_USER_NOT_AUTHORIZED);
+            } else {
+                downloadData();
+            }
         }
+
+
     }
 
     @Override
@@ -157,24 +211,29 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
 
     }
 
+
     //загружаем данные с сервера и сохраняем локально
     public void downloadData() {
-        if (sIsUserChecked) {
-            showProgress();
-        } else {
-            //это всегда будет при входе
-            showSplash();
-        }
+        postEvent(MES_DOWNLOAD_STARTED);
     }
 
     //отображаем локальные данные
-    public abstract void showData();
+
+
+    //отображаем локальные данные
+    public void showData() {
+        if (sIsAuthChecked) {
+            postEvent(MES_SHOW_STARTED);
+        } else {
+            postEvent(MES_USER_NOT_AUTHORIZED);
+        }
+    }
 
     //сообщаем об ошибке
-    public abstract void showError(String mes);
+    public abstract void showErrorMes(String mes);
 
     //сообщаем об успехах
-    public abstract void showInfo(String mes);
+    public abstract void showInfoMes(String mes);
 
 
     /**
@@ -194,6 +253,10 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
             mLoginFragment = new LoginFragment();
             mLoginFragment.show(getSupportFragmentManager(), TAG_LOGIN_FRAGMENT);
         }
+        hideProgress();
+
+        //выделяем пункт меню текущей активности; до этого стояло на logout
+        checkCurrentDrawerMenuItem();
     }
 
 
@@ -209,6 +272,7 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
     //worry about blocking activities home and back buttons!!!
     public void showProgress() {
         Log.d(LOG_TAG, "showProgress()");
+
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this, R.style.progress_screen);
             mProgressDialog.setCancelable(true);
@@ -220,19 +284,6 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
 
     }
 
-    public void showSplash() {
-        Log.d(LOG_TAG, "showSplash()");
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this, R.style.progress_screen);
-            mProgressDialog.setCancelable(false);
-//            mProgressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-
-        mProgressDialog.show();
-        mProgressDialog.setContentView(R.layout.splash_screen);
-    }
-
-
     public void hideProgress() {
         Log.d(LOG_TAG, "hideProgress()");
         if (mProgressDialog != null) {
@@ -241,35 +292,22 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
         }
     }
 
+
+    public void checkCurrentDrawerMenuItem() {
+    }
+
+    public void showSplash() {
+    }
+
+
     public void hideSplash() {
-        Log.d(LOG_TAG, "hideSplash()");
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
-        }
-    }
-
-
-    public void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-    }
-
-    private void runWithDelay() {
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                hideProgress();
-            }
-        }, 5000);
     }
 
 
     public void logout() {
-        DataManager.getInstance().getPreferencesManager().removeTokenAndKey();
-        DataManager.getInstance().getPreferencesManager().removeLoginAndPass();
-        //обновляем с сервера, на форму авторизации отправит сразу автоматом
-        downloadData();
+
+        postEvent(MES_LOGOUT);
+
     }
 
 

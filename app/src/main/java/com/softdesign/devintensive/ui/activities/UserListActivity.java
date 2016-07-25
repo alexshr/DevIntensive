@@ -19,8 +19,9 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.redmadrobot.chronos.ChronosConnector;
@@ -67,8 +68,8 @@ public class UserListActivity extends BaseManagerActivity {
     @BindView(R.id.navigation_view)
     NavigationView mNavigationView;
 
-    @BindView(R.id.progress)
-    ProgressBar mProgressBar;
+    @BindView(R.id.splash)
+    LinearLayout mSplash;
 
 
     private UserListRetainFragment mRetainFragment;
@@ -127,6 +128,18 @@ public class UserListActivity extends BaseManagerActivity {
     }
 
 
+    @Override
+    public void showSplash() {
+        super.showSplash();
+        mSplash.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideSplash() {
+        super.hideSplash();
+        mSplash.setVisibility(View.GONE);
+    }
+
     // отображение локального списка
     @Override
     public void showData() {
@@ -136,9 +149,11 @@ public class UserListActivity extends BaseManagerActivity {
         if (mRetainFragment == null) {
             mRetainFragment = new UserListRetainFragment();
             getSupportFragmentManager().beginTransaction().add(mRetainFragment, TAG_RETAIN_FRAGMENT).commit();
+            Log.d(LOG_TAG, "retainFragment added");
         }
         mSortCriteria = mDataManager.getPreferencesManager().getSortCriteria();
         if (mRetainFragment.getUserList() == null) {
+            Log.d(LOG_TAG, "mRetainFragment userList=null");
             //проверяем наличие данных
             //получаем полный список с выбранной сортировкой
             //поток запускаем в chronos
@@ -148,20 +163,20 @@ public class UserListActivity extends BaseManagerActivity {
 
         } else {
             mUsers = mRetainFragment.getUserList();
-            showUserList(mRetainFragment.getUserList());
+            showUserList(mUsers);
 
         }
     }
 
     @Override
-    public void showError(String mes) {
+    public void showErrorMes(String mes) {
         hideProgress();
         Utils.showErrorOnSnackBar(mCoordinatorLayout, mes);
     }
 
 
     @Override
-    public void showInfo(String mes) {
+    public void showInfoMes(String mes) {
         hideProgress();
         Utils.showInfoOnSnackBar(mCoordinatorLayout, mes);
     }
@@ -174,7 +189,7 @@ public class UserListActivity extends BaseManagerActivity {
         if (mPrefManager.getAuthToken().isEmpty()) {
             if (mPrefManager.getLogin().isEmpty()) {
                 //отправляемся спрашивать у пользователя логин и пароль
-                postEvent(DownloadDataService.MES_LOGIN_OR_PASSWORD_ABSENT);
+                postEvent(BaseManagerActivity.MES_USER_NOT_AUTHORIZED);
             } else {
                 //идем на авторизацию и сразу взятие списка
                 DownloadDataService.startActionFull(this, mPrefManager.getLogin(), mPrefManager.getPassword());
@@ -314,9 +329,9 @@ public class UserListActivity extends BaseManagerActivity {
     }
 
     private void setupDrawer() {
-        final NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        navigationView.getMenu().getItem(0).setChecked(true);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+
+        mNavigationView.getMenu().getItem(0).setChecked(true);
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
@@ -342,7 +357,7 @@ public class UserListActivity extends BaseManagerActivity {
         });
 
         // установка круглого аватара
-        ImageView userAvatarImg = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar);
+        ImageView userAvatarImg = (ImageView) mNavigationView.getHeaderView(0).findViewById(R.id.avatar);
         Uri avatarUri = mDataManager.getPreferencesManager().getAvatarUri();
         Picasso.with(this)
                 .load(avatarUri)
@@ -353,17 +368,17 @@ public class UserListActivity extends BaseManagerActivity {
                 .into(userAvatarImg);
 
         //show user name and email
-        TextView userNameView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_name);
+        TextView userNameView = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.user_name);
         String userName = mDataManager.getPreferencesManager().getUserName();
         userNameView.setText(userName);
 
-        TextView userEmailView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_email);
+        TextView userEmailView = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.user_email);
         String email = mDataManager.getPreferencesManager().getEmail();
         userEmailView.setText(email);
     }
 
     private void showUserList(List<User> users) {
-        Log.d(LOG_TAG,"showUserList count="+users.size());
+        Log.d(LOG_TAG, "showUserList count=" + users.size());
         mUsers = users;
         mUserListAdapter = new UserListAdapter(users, new UserListAdapter.UserViewHolder.UserItemClickListener() {
             @Override
@@ -381,6 +396,10 @@ public class UserListActivity extends BaseManagerActivity {
         hideProgress();
     }
 
+    @Override
+    public void checkCurrentDrawerMenuItem() {
+        mNavigationView.getMenu().getItem(0).setChecked(true);
+    }
 
     /**
      * chronos
@@ -388,11 +407,12 @@ public class UserListActivity extends BaseManagerActivity {
      * @param result
      */
     public void onOperationFinished(final LoadUserListFromDbTask.Result result) {
-        Log.d(LOG_TAG, "onOperationFinished result result.isSuccessful() " + result.isSuccessful());
+        Log.d(LOG_TAG, "onOperationFinished result result.isSuccessful() " + result.isSuccessful()+" count="+result.getOutput().size());
         if (result.isSuccessful()) {
-            showUserList(result.getOutput());
+            mUsers=result.getOutput();
+            showUserList(mUsers);
         } else {
-            showError(result.getErrorMessage());
+            showErrorMes(result.getErrorMessage());
         }
     }
 
