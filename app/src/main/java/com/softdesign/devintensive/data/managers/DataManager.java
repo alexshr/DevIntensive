@@ -1,6 +1,7 @@
 package com.softdesign.devintensive.data.managers;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.util.Log;
 
 import com.softdesign.devintensive.data.network.PicassoCache;
@@ -11,17 +12,15 @@ import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
 import com.softdesign.devintensive.data.storage.models.DaoSession;
 import com.softdesign.devintensive.data.storage.models.User;
-import com.softdesign.devintensive.data.storage.models.UserDao;
 import com.softdesign.devintensive.data.storage.models.UserOrder;
-import com.softdesign.devintensive.data.storage.models.UserOrderDao;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.DevApplication;
 import com.squareup.picasso.Picasso;
 
-import org.greenrobot.greendao.query.QueryBuilder;
+import org.greenrobot.greendao.AbstractDao;
+import org.greenrobot.greendao.InternalQueryDaoAccess;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -31,11 +30,14 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 
 public class DataManager {
+
+    private static String LOG_TAG = ConstantManager.LOG_TAG + "_DataManager";
     private static DataManager INSTANCE;
     private PreferencesManager mPreferencesManager;
     private RestService mRestService;//rest service
     private Context mContext;
     private Picasso mPicasso;
+
 
     private DaoSession mDaoSession;
 
@@ -67,6 +69,7 @@ public class DataManager {
 
     /**
      * rest api auth request
+     *
      * @param userLoginReq
      * @return
      */
@@ -76,6 +79,7 @@ public class DataManager {
 
     /**
      * rest api get image request
+     *
      * @param url
      * @return
      */
@@ -85,6 +89,7 @@ public class DataManager {
 
     /**
      * rest api upload photo request
+     *
      * @param photoFile
      * @return
      */
@@ -98,6 +103,7 @@ public class DataManager {
 
     /**
      * rest api user list request
+     *
      * @return
      */
     public Call<UserListRes> getUserListFromNetwork() {
@@ -111,40 +117,8 @@ public class DataManager {
     }
 
 
-    public List<User> getAllUserListOrderedByRatingFromDb() {
-        List<User> userList = new ArrayList<>();
-
-        try {
-            userList = mDaoSession.queryBuilder(User.class)
-                    .orderDesc(UserDao.Properties.Rating)
-                    .build()
-                    .list();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return userList;
-    }
-
-    public List<User> getUserListSortedByNameFromDb(String query) {
-
-        List<User> userList = new ArrayList<>();
-        try {
-            userList = mDaoSession.queryBuilder(User.class)
-                    .where(UserDao.Properties.Rating.gt(0),
-                            UserDao.Properties.SearchName.like("%" + query.toUpperCase() + "%"))
-                    .orderDesc(UserDao.Properties.Rating)
-                    .build()
-                    .list();
-        } catch (Exception e) {
-            Log.e(ConstantManager.LOG_TAG,"getUserListSortedByNameFromDb",e);
-        }
-
-        return userList;
-    }
-
-    //сохраняем в базе порядковые номера всех пользователей
-    public void saveUserOrdersInDb(List<User> userList) {
+   //сохраняем в отд таблице порядок карточек
+    public void saveUserListOrderInDb(List<User> userList) {
 
         try {
             mDaoSession.getUserOrderDao().deleteAll();
@@ -153,29 +127,63 @@ public class DataManager {
                 mDaoSession.getUserOrderDao().insertInTx(new UserOrder(userList.get(i).getRemoteId(), i));
             }
         } catch (Exception e) {
-            Log.e(ConstantManager.LOG_TAG,"saveUserOrdersInDb",e);
+            e.printStackTrace();
         }
     }
 
 
-    public List<User> getUserOrderedListFromDb() {
 
-        List<User> userList = new ArrayList<>();
+    /**
+     * список пользователей, работает и при обновлении с сервера - новые записи идут вниз
+     * Этот запрос - единственный на все случаи вывода списка!!
+     * Захотим вернуть стандартную сортировку - просто удаляем таблицу user_order
+     * <p>
+     * Пришлось извращаться, т.к. greendao не умеет left join,
+     * а обычный join приведет к тому, что при обновлениии все новые записи будут невидимы
+     * <p>
+     * благодаря крутому выражению в сортировке: USER_ORDER IS NULL ASC
+     * новые записи идут в конец списка
+     *
+     * @param nameFilter
+     * @return
+     */
+    public List<User> getUserListFromDb(String nameFilter) {
+
+
+        String[] params = new String[]{};
         try {
-            QueryBuilder<User> queryBuilder = mDaoSession.queryBuilder(User.class);
-            queryBuilder.join(UserDao.Properties.RemoteId, UserOrder.class, UserOrderDao.Properties.UserRemoteId);
-            queryBuilder.where(UserDao.Properties.Rating.gt(0));
-            queryBuilder.orderRaw("USER_ORDER ASC");
-            queryBuilder.distinct();
-            userList = queryBuilder.list();
+            StringBuilder sb = new StringBuilder();
+            sb.append(" SELECT  T._id,T.REMOTE_ID,T.PHOTO,T.FULL_NAME,T.SEARCH_NAME,T.RATING,T.CODE_LINES,T.PROJECTS,T.BIO");
+            sb.append(" FROM USERS T");
+            sb.append(" LEFT JOIN USER_ORDER J1 ON T.REMOTE_ID=J1.USER_REMOTE_ID");
+            sb.append(" WHERE T.RATING>0");
+            if (nameFilter != null && nameFilter.length() > 0) {
+                sb.append(" AND T.SEARCH_NAME LIKE ? ");
+                params = new String[]{"%"+nameFilter+"%"};
+            }
+            sb.append(" ORDER BY USER_ORDER IS NULL ASC,USER_ORDER ASC, RATING DESC");
+
+            //Log.d(LOG_TAG, "getUserListFromDb before daoAccess.loadAllAndCloseCursor");
+
+            AbstractDao dao = getDaoSession().getDao(User.class);
+            Cursor cursor = dao.getDatabase().rawQuery(sb.toString(), params);
+            InternalQueryDaoAccess daoAccess = new InternalQueryDaoAccess<User>(dao);
+            //Log.d(LOG_TAG,"getUserListFromDb() filter="+(nameFilter==null?"null":nameFilter));
+
+
+
+            List<User> users= daoAccess.loadAllAndCloseCursor(cursor);
+            /*
+            for(User user:users){
+                Log.d(LOG_TAG,"user from db: "+user);
+            }
+            */
+            return users;
 
         } catch (Exception e) {
-            Log.e(ConstantManager.LOG_TAG,"getUserOrderedListFromDb",e);
+            Log.e(LOG_TAG, "", e);
+            return null;
         }
 
-        return userList;
     }
-
-
-    // endregion
 }

@@ -191,7 +191,7 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
             if (mPrefManager.hasTokenOrLogin()) {
                 postEvent(MES_USER_NOT_AUTHORIZED);
             } else {
-                downloadData();
+                showData();
             }
         }
 

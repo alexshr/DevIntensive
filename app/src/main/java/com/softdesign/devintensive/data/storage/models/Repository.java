@@ -112,6 +112,16 @@ public class Repository {
         this.id = id;
     }
 
+    @Override
+    public String toString() {
+        return "Repository{" +
+                "id=" + id +
+                ", remoteId='" + remoteId + '\'' +
+                ", repositoryName='" + repositoryName + '\'' +
+                ", userRemoteId='" + userRemoteId + '\'' +
+                '}';
+    }
+
     @Generated(hash = 1976272162)
     public Repository(Long id, @NotNull String remoteId, String repositoryName,
             String userRemoteId) {

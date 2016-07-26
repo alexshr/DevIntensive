@@ -30,8 +30,7 @@ public interface ConstantManager {
     String USER_LOGIN_KEY = "USER_LOGIN_KEY";
 
     String USER_PASS_KEY = "USER_PASS_KEY";
-
-
+    String USER_NAME_FILTER = "USER_NAME_FILTER";
 
 
 
@@ -47,10 +46,6 @@ public interface ConstantManager {
     //activity request codes
     int REQUEST_CAMERA_PICTURE = 1;
     int REQUEST_GALLERY_PICTURE = 2;
-
-
-
-    String SORT_CRITERIA = "SORT_CRITERIA";
 
 
 

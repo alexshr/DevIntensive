@@ -12,6 +12,8 @@ import java.util.List;
 public class PreferencesManager {
     private SharedPreferences mSharedPreferences;
 
+    private static final String LOG_TAG=ConstantManager.LOG_TAG+"_PreferencesManager";
+
     public static final String[] USER_FIELDS = {
             ConstantManager.USER_PHONE_KEY,
             ConstantManager.USER_MAIL_KEY,
@@ -199,6 +201,14 @@ public class PreferencesManager {
     }
 
 
+
+    public void saveIsUserListOrderChanged(boolean isChanged) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putBoolean(ConstantManager.USER_NAME_FILTER, isChanged);
+        editor.apply();
+    }
+
+
     public void removeAuth() {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString(ConstantManager.USER_ID_KEY, "");
@@ -212,13 +222,4 @@ public class PreferencesManager {
         return getAuthToken().isEmpty()&&getLogin().isEmpty();
     }
 
-    public String getSortCriteria() {
-        return mSharedPreferences.getString(ConstantManager.SORT_CRITERIA, "");
-    }
-
-    public void saveSortCriteria(String sortCriteria) {
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putString(ConstantManager.SORT_CRITERIA, sortCriteria);
-        editor.apply();
-    }
 }

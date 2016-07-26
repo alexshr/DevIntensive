@@ -9,6 +9,7 @@ import java.util.List;
 
 public class UserListRetainFragment extends Fragment {
     private List<User> mUserList;
+    private String mNameFilter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -21,7 +22,13 @@ public class UserListRetainFragment extends Fragment {
         return mUserList;
     }
 
-    public void setUserList(List<User> userList) {
-        mUserList = userList;
+
+
+    public String getNameFilter() {
+        return mNameFilter;
+    }
+
+    public void setNameFilter(String nameFilter) {
+        mNameFilter = nameFilter;
     }
 }

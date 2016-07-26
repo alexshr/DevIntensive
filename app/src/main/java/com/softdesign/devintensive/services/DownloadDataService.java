@@ -31,7 +31,7 @@ import retrofit2.Response;
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
- * <p/>
+ * <p>
  * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
@@ -189,11 +189,15 @@ public class DownloadDataService extends IntentService {
 
                 for (UserListRes.UserData userRes : response.body().getData()) {
                     allRepositories.addAll(getRepoListFromUserRes(userRes));
-                    allUsers.add(new User(userRes));
+                    User user = new User(userRes);
+                    allUsers.add(user);
+
                 }
 
                 mRepositoryDao.insertOrReplaceInTx(allRepositories);//вставляем пакетом!
+
                 mUserDao.insertOrReplaceInTx(allUsers);
+
 
 
                 return true;

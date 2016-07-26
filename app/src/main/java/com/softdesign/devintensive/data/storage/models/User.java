@@ -191,6 +191,7 @@ public class User {
 
     public void setPhoto(String photo) {
         this.photo = photo;
+
     }
 
     public String getRemoteId() {
@@ -207,6 +208,23 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
+
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", remoteId='" + remoteId + '\'' +
+                ", photo='" + photo + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", searchName='" + searchName + '\'' +
+                ", rating=" + rating +
+                ", codeLines=" + codeLines +
+                ", projects=" + projects +
+                ", bio='" + bio + '\'' +
+                ", repositories=" + repositories +
+                '}';
     }
 
     @Generated(hash = 1023608416)

@@ -10,32 +10,39 @@ import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.utils.ConstantManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class LoadUserListFromDbTask extends ChronosOperation<List<User>> {
-    private String mFilter = "";
-    private List<User> res;
+/**
+ * сохраняем порядок в списке
+ */
+
+public class SaveUserOrdersInDbTask extends ChronosOperation<List<User>> {
+    public static final String FULL_LIST = "FULL_LIST";
+    public static final String FILTERED_LIST = "FILTERED_LIST";
+    private List<User> mUserList = new ArrayList<>();
 
 
     private String LOG_TAG = ConstantManager.LOG_TAG;
 
-    public LoadUserListFromDbTask() {
+    public SaveUserOrdersInDbTask() {
 
     }
 
-    public LoadUserListFromDbTask(String userName) {
-        mFilter = userName;
+    public SaveUserOrdersInDbTask(List<User> userList) {
+        mUserList = userList;
+
     }
 
     @Nullable
     @Override
     public List<User> run() {
 
-        Log.d(LOG_TAG, "LoadUserListFromDbTask run started filter=" + mFilter);
+        Log.d(LOG_TAG, "SaveUserOrdersInDbTask run started");
+        DataManager.getInstance().saveUserListOrderInDb(mUserList);
 
-        res = DataManager.getInstance().getUserListFromDb(mFilter);
 
-        return res;
+        return mUserList;
     }
 
     @NonNull

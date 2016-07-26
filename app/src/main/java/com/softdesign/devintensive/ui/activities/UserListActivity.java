@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -28,10 +27,10 @@ import com.redmadrobot.chronos.ChronosConnector;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.managers.PreferencesManager;
-import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
 import com.softdesign.devintensive.data.storage.tasks.LoadUserListFromDbTask;
+import com.softdesign.devintensive.data.storage.tasks.SaveUserOrdersInDbTask;
 import com.softdesign.devintensive.services.DownloadDataService;
 import com.softdesign.devintensive.ui.adapters.UserListAdapter;
 import com.softdesign.devintensive.ui.fragments.UserListRetainFragment;
@@ -40,7 +39,6 @@ import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.Utils;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -78,8 +76,8 @@ public class UserListActivity extends BaseManagerActivity {
     private List<User> mUsers;
     private int currTask;
     private PreferencesManager mPrefManager;
-    private String mSortCriteria;
-    private int mCurrTask;
+
+    private boolean mIsUserOrderChanged;
 
 
     @Override
@@ -89,6 +87,15 @@ public class UserListActivity extends BaseManagerActivity {
 
 
         ButterKnife.bind(this);
+
+        mRetainFragment = (UserListRetainFragment) getSupportFragmentManager().findFragmentByTag(TAG_RETAIN_FRAGMENT);
+        if (mRetainFragment == null) {
+            mRetainFragment = new UserListRetainFragment();
+            getSupportFragmentManager().beginTransaction().add(mRetainFragment, TAG_RETAIN_FRAGMENT).commit();
+            Log.d(LOG_TAG, "retainFragment added");
+        }
+
+
         mChronosConnector.onCreate(this, savedInstanceState);
 
         mDataManager = DataManager.getInstance();
@@ -106,8 +113,10 @@ public class UserListActivity extends BaseManagerActivity {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+
                 final int fromPos = viewHolder.getAdapterPosition();
                 final int toPos = target.getAdapterPosition();
+                mIsUserOrderChanged = true;
 
                 mUsers.add(toPos, mUsers.remove(fromPos));
                 mUserListAdapter.notifyItemMoved(fromPos, toPos);
@@ -120,6 +129,8 @@ public class UserListActivity extends BaseManagerActivity {
                 int position = viewHolder.getAdapterPosition();
                 mUsers.remove(position);
                 mUserListAdapter.notifyDataSetChanged();
+                mIsUserOrderChanged = true;
+
             }
         });
         itemTouchHelper.attachToRecyclerView(mRecyclerView);
@@ -145,21 +156,18 @@ public class UserListActivity extends BaseManagerActivity {
     public void showData() {
         Log.d(LOG_TAG, "showData started");
         showProgress();
-        mRetainFragment = (UserListRetainFragment) getSupportFragmentManager().findFragmentByTag(TAG_RETAIN_FRAGMENT);
-        if (mRetainFragment == null) {
-            mRetainFragment = new UserListRetainFragment();
-            getSupportFragmentManager().beginTransaction().add(mRetainFragment, TAG_RETAIN_FRAGMENT).commit();
-            Log.d(LOG_TAG, "retainFragment added");
-        }
-        mSortCriteria = mDataManager.getPreferencesManager().getSortCriteria();
+
+
         if (mRetainFragment.getUserList() == null) {
             Log.d(LOG_TAG, "mRetainFragment userList=null");
             //проверяем наличие данных
             //получаем полный список с выбранной сортировкой
             //поток запускаем в chronos
 
-            mCurrTask = mChronosConnector.runOperation(
-                    new LoadUserListFromDbTask(null, mSortCriteria), false);
+            //до нового запуска приложения строку поиска пока не храню
+            mChronosConnector.runOperation(
+                    new LoadUserListFromDbTask(mRetainFragment.getNameFilter()), false);
+
 
         } else {
             mUsers = mRetainFragment.getUserList();
@@ -206,15 +214,7 @@ public class UserListActivity extends BaseManagerActivity {
     protected void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
         mChronosConnector.onSaveInstanceState(outState);
-        if (mUsers != null) {
-            mRetainFragment.setUserList(mUsers);
-            mDataManager.saveUserOrdersInDb(mUsers);
-            if (mSortCriteria == null || mSortCriteria.equals("")) {
-                mPrefManager.saveSortCriteria(LoadUserListFromDbTask.SORTED_BY_USER_LIST);
-            } else {
-                mDataManager.getPreferencesManager().saveSortCriteria(mSortCriteria);
-            }
-        }
+
     }
 
 
@@ -239,13 +239,15 @@ public class UserListActivity extends BaseManagerActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mDataManager.saveUserOrdersInDb(mUsers);
-        if (mSortCriteria == null || mSortCriteria.equals("")) {
-            mDataManager.getPreferencesManager().saveSortCriteria(LoadUserListFromDbTask.SORTED_BY_USER_LIST);
-        } else {
-            mDataManager.getPreferencesManager().saveSortCriteria(mSortCriteria);
+
+        if (mIsUserOrderChanged) {
+            mPrefManager.saveIsUserListOrderChanged(true);
+            mChronosConnector.runOperation(
+                    new SaveUserOrdersInDbTask(mUsers), false);
         }
+
     }
+
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -262,18 +264,26 @@ public class UserListActivity extends BaseManagerActivity {
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
+            public boolean onQueryTextChange(final String newText) {
                 //ввели новый символ - отменяем поиск и запускаем актуальный
+                mRetainFragment.setNameFilter(newText.trim());
                 if (mChronosConnector.isOperationRunning(currTask)) {
                     mChronosConnector.cancelOperation(currTask, true);
                 }
-                currTask = mChronosConnector.runOperation(
-                        new LoadUserListFromDbTask(newText, LoadUserListFromDbTask.SEARCH_LIST), false);
-
-
+                currTask = mChronosConnector.runOperation(new LoadUserListFromDbTask(newText), false);
                 return true;
             }
         });
+
+        String filter=mRetainFragment.getNameFilter();
+        if(filter!=null&&filter.length()>0){
+            searchView.setIconified(false);
+            searchMenuItem.expandActionView();
+            searchView.setQuery(filter,true);
+        }
+
+
+
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -296,20 +306,6 @@ public class UserListActivity extends BaseManagerActivity {
         return true;
     }
 
-
-    private List<UserListRes.UserData> filter(List<UserListRes.UserData> models, String query) {
-        query = query.toLowerCase();
-
-        final List<UserListRes.UserData> filteredModelList = new ArrayList<>();
-        for (UserListRes.UserData model : models) {
-            final String text = model.getFullName().toLowerCase();
-            if (text.contains(query)) {
-                filteredModelList.add(model);
-            }
-        }
-        return filteredModelList;
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -324,9 +320,6 @@ public class UserListActivity extends BaseManagerActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void showSnackbar(String message) {
-        Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG).show();
-    }
 
     private void setupDrawer() {
 
@@ -379,20 +372,26 @@ public class UserListActivity extends BaseManagerActivity {
 
     private void showUserList(List<User> users) {
         Log.d(LOG_TAG, "showUserList count=" + users.size());
-        mUsers = users;
-        mUserListAdapter = new UserListAdapter(users, new UserListAdapter.UserViewHolder.UserItemClickListener() {
-            @Override
-            public void onUserItemClick(int adapterPosition) {
 
-                UserDTO userDTO = new UserDTO(mUserListAdapter.getUser(adapterPosition));
-                Intent intent = new Intent(UserListActivity.this, ProfileUserActivity.class);
-                intent.putExtra(ConstantManager.USER_DTO_KEY, userDTO);
+        if (mUserListAdapter == null) {
+            mUsers = users;
+            mUserListAdapter = new UserListAdapter(users, new UserListAdapter.UserViewHolder.UserItemClickListener() {
+                @Override
+                public void onUserItemClick(int adapterPosition) {
 
-                startActivity(intent);
+                    UserDTO userDTO = new UserDTO(mUserListAdapter.getUser(adapterPosition));
+                    Intent intent = new Intent(UserListActivity.this, ProfileUserActivity.class);
+                    intent.putExtra(ConstantManager.USER_DTO_KEY, userDTO);
 
-            }
-        });
-        mRecyclerView.setAdapter(mUserListAdapter);
+                    startActivity(intent);
+
+                }
+            });
+
+            mRecyclerView.setAdapter(mUserListAdapter);
+        } else {
+            mUserListAdapter.swap(users);
+        }
         hideProgress();
     }
 
@@ -407,12 +406,21 @@ public class UserListActivity extends BaseManagerActivity {
      * @param result
      */
     public void onOperationFinished(final LoadUserListFromDbTask.Result result) {
-        Log.d(LOG_TAG, "onOperationFinished result result.isSuccessful() " + result.isSuccessful()+" count="+result.getOutput().size());
+
+        Log.d(LOG_TAG, "onOperationFinished result result.isSuccessful() " + result.isSuccessful() + " count=" + result.getOutput().size());
         if (result.isSuccessful()) {
-            mUsers=result.getOutput();
+            mUsers = result.getOutput();
             showUserList(mUsers);
         } else {
             showErrorMes(result.getErrorMessage());
+        }
+    }
+
+    public void onOperationFinished(final SaveUserOrdersInDbTask.Result result) {
+        Log.d(LOG_TAG, "SaveUserOrdersInDbTask result result.isSuccessful() " + result.isSuccessful() + " result data isn not interesting");
+        if (!result.isSuccessful()) {
+
+            Log.e(LOG_TAG, "", result.getException());
         }
     }
 

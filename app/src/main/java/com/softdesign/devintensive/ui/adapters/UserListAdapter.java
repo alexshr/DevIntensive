@@ -1,7 +1,6 @@
 package com.softdesign.devintensive.ui.adapters;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,16 +12,13 @@ import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
-import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.ui.views.AspectRatioImageView;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.Utils;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -58,13 +54,15 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
     @Override
     public void onBindViewHolder(final UserViewHolder holder, int position) {
-        User user = mUserList.get(position);
 
+
+        User user = mUserList.get(position);
 
         holder.mFullName.setText(user.getFullName());
         holder.mRating.setText(user.getRating() + "");
         holder.mCodeLines.setText(user.getCodeLines() + "");
         holder.mProjects.setText(user.getProjects() + "");
+
 
 
         if (user.getBio() == null || user.getBio().isEmpty()) {
@@ -74,27 +72,18 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             holder.mBio.setText(user.getBio());
         }
 
-        //String userPhoto = user.getPublicInfo().getPhoto();
-/*
-        Picasso.with(mContext)
-                .load(userPhoto)
-                .resize(mWidth,mHeight)
-                .centerCrop()
-                .placeholder(mContext.getResources().getDrawable(R.drawable.user_bg))
-                .error(mContext.getResources().getDrawable(R.drawable.user_bg))
-                .into(holder.userPhoto);
-*/
+
+
 
         String userPhoto = user.getPhoto();
-        if (userPhoto.isEmpty()) {
+        if (userPhoto != null && userPhoto.isEmpty()) {
             userPhoto = "null";
-            Log.e(LOG_TAG, "onBindViewHolder: user with name " + user.getFullName() + " has no photo");
         } else {
             final String finalUserPhoto = userPhoto;
 
             DataManager.getInstance().getPicasso()
                     .load(userPhoto)
-                    .resize(mWidth,mHeight)  //fit дольше работает, т.к. сам измеряет ImageView, а наш измеренный заранее!!
+                    .resize(mWidth, mHeight)  //fit дольше работает, т.к. сам измеряет ImageView, а наш измеренный заранее!!
                     .centerCrop()
                     .networkPolicy(NetworkPolicy.OFFLINE)
                     .error(holder.mDummy)
@@ -135,13 +124,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         return mUserList.size();
     }
 
-    /*
-    public void setFilter(List<UserListRes.UserData> users) {
-        mUserList = new ArrayList<>();
-        mUserList.addAll(users);
-        notifyDataSetChanged();
-    }
-*/
+
 
     public User getUser(int position) {
         return mUserList.get(position);
@@ -185,5 +168,14 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         public interface UserItemClickListener {
             void onUserItemClick(int adapterPosition);
         }
+
+
     }
+
+    public void swap(List<User> data) {
+        mUserList.clear();
+        mUserList.addAll(data);
+        notifyDataSetChanged();
+    }
+
 }
