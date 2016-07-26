@@ -31,7 +31,7 @@ import retrofit2.Response;
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
- * <p>
+ * <p/>
  * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
@@ -115,6 +115,7 @@ public class DownloadDataService extends IntentService {
                 if (login == null) {
                     //пароль не прислали - значит сразу идем за списком
                     if (loadUserListFromServerAndSaveInDb()) {
+                        EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_AUTHORIZATED));
                         EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_DOWNLOAD_FINISHED));
                     }
                 } else {
@@ -197,8 +198,7 @@ public class DownloadDataService extends IntentService {
                 mRepositoryDao.insertOrReplaceInTx(allRepositories);//вставляем пакетом!
 
                 mUserDao.insertOrReplaceInTx(allUsers);
-
-
+                Log.d(LOG_TAG, "loadUserListFromServerAndSaveInDb result size=" + allUsers.size());
 
                 return true;
 
@@ -242,6 +242,8 @@ public class DownloadDataService extends IntentService {
      * @param pass
      */
     private void saveTokenAndProfile(UserModelRes userModel, String login, String pass) {
+
+        Log.d(LOG_TAG, "saveTokenAndProfile started");
 
         mPrefManager.saveLogin(login);
         mPrefManager.savePassword(pass);

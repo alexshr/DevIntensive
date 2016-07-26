@@ -218,8 +218,12 @@ public class PreferencesManager {
         editor.apply();
     }
 
+    /**
+     * проверяем стоит ли попробовать запрос или немедленно - на авторизацию
+     * @return
+     */
     public boolean hasTokenOrLogin(){
-        return getAuthToken().isEmpty()&&getLogin().isEmpty();
+        return !getAuthToken().isEmpty()||!getLogin().isEmpty();
     }
 
 }

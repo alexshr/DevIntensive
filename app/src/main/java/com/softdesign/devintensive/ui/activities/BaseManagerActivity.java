@@ -36,6 +36,7 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
     //запросу на профайл всегда нужен логин и пароль (токен не интересен)
     //public static final String MES_LOGIN_OR_PASSWORD_ABSENT = "MES_LOGIN_OR_PASSWORD_ABSENT";
 
+    //подтвержение того, что пользователь авторизован
     public static final String MES_AUTHORIZATED = "MES_AUTHORIZATED";
 
     //получение и сохранение данных из сети
@@ -67,6 +68,9 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
 
     private static String LOG_TAG = ConstantManager.LOG_TAG + "_BaseActivity";
 
+    //чтобы не перекрывать slash прогрессом
+    private boolean mIsSlashNow;
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
@@ -83,17 +87,16 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
                 showLoginDialog();
                 hideProgress();
 
+                //чтобы не мигал фон плавно убираем splash (если есть)
+                //на форме автор. фон как у splash
+                uiHandler.postDelayed(new Runnable() {
+                    //убираем splash c задержкой, чтобы не мигало при смене экрана
+                    @Override
+                    public void run() {
+                        hideSplash();
+                    }
+                }, 300);
 
-                if (sIsFirstStart) {
-                    sIsFirstStart = false;
-                    uiHandler.postDelayed(new Runnable() {
-                        //убираем splash c задержкой, чтобы не мигало при смене экрана
-                        @Override
-                        public void run() {
-                            hideSplash();
-                        }
-                    }, 300);
-                }
                 break;
 
             case MES_LOGIN_OR_PASSWORD_INCORRECT:
@@ -104,14 +107,11 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
 
             case MES_AUTHORIZATED:
                 sIsAuthChecked = true;
+                hideSplash();
                 dismissLoginFragment();
                 break;
 
             case MES_DOWNLOAD_STARTED:
-                if (sIsFirstStart) {
-                    hideSplash();
-                    sIsFirstStart = false;
-                }
                 showProgress();
                 break;
 
@@ -138,6 +138,7 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
                 break;
 
             case MES_SHOW_FINISHED:
+
                 hideProgress();
                 break;
 
@@ -172,30 +173,34 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
         EventBus.getDefault().register(this);
         Log.d(LOG_TAG, "onStart started sIsFirstStart=" + sIsFirstStart + " sIsAuthChecked=" + sIsAuthChecked);
 
-        //пока не подтвердится авторизация - пользователь лок данных не увидит
+        long delay = 0;
         if (sIsFirstStart) {
+
             //держим splash
             showSplash();
-            uiHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    //hideSplash();
-                    if (mPrefManager.hasTokenOrLogin()) {
-                        postEvent(MES_USER_NOT_AUTHORIZED);
+            delay = SPLASH_DURATION;
+            //не убираем тут splash,чтобы был не мигал белый экран при появлении формы авторизации
+            //уберем либо при появлении экрана авторизации,
+            //либо когда будет ясно, что авторизацияне потребуется
+        }
+        uiHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!mPrefManager.hasTokenOrLogin()) {
+                    postEvent(MES_USER_NOT_AUTHORIZED);
+                } else {
+                    //загрузка с сервера только если нужно проверить автор.
+                    //пользователь обновляет данные по кнопке меню
+                    //и нужно сделать, чтобы сервис регулярно обновлял лок базу
+                    if (sIsAuthChecked) {
+                        showData();
                     } else {
                         downloadData();
                     }
                 }
-            }, SPLASH_DURATION);
-        } else {
-            if (mPrefManager.hasTokenOrLogin()) {
-                postEvent(MES_USER_NOT_AUTHORIZED);
-            } else {
-                showData();
+                sIsFirstStart = false;
             }
-        }
-
-
+        }, delay);
     }
 
     @Override
@@ -217,7 +222,6 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
         postEvent(MES_DOWNLOAD_STARTED);
     }
 
-    //отображаем локальные данные
 
 
     //отображаем локальные данные
@@ -235,13 +239,16 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
     //сообщаем об успехах
     public abstract void showInfoMes(String mes);
 
+    //проверка наличия локальной даты
+    //public abstract boolean hasLocalData();
+
 
     /**
      * submit на форме ввода логина
      */
     @Override
     public void onSubmit() {
-        //dismissLoginFragment();
+        //загружаем, чтобы проверить авторизацию
         downloadData();
     }
 
@@ -272,16 +279,17 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
     //worry about blocking activities home and back buttons!!!
     public void showProgress() {
         Log.d(LOG_TAG, "showProgress()");
+        if (!isSlashNow()) {
+            //slash экран не перекрываем
+            if (mProgressDialog == null) {
+                mProgressDialog = new ProgressDialog(this, R.style.progress_screen);
+                mProgressDialog.setCancelable(true);
+                mProgressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this, R.style.progress_screen);
-            mProgressDialog.setCancelable(true);
-            mProgressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
+            }
+            mProgressDialog.show();
+            mProgressDialog.setContentView(R.layout.progress_screen);
         }
-        mProgressDialog.show();
-        mProgressDialog.setContentView(R.layout.progress_screen);
-
     }
 
     public void hideProgress() {
@@ -297,17 +305,17 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
     }
 
     public void showSplash() {
+        setIsSlashNow(true);
     }
 
 
     public void hideSplash() {
+        setIsSlashNow(false);
     }
 
 
     public void logout() {
-
         postEvent(MES_LOGOUT);
-
     }
 
 
@@ -353,5 +361,14 @@ public abstract class BaseManagerActivity extends AppCompatActivity implements L
         Log.v(LOG_TAG, "onRestoreInstanceState started");
 
     }
+
+    public void setIsSlashNow(boolean isSlashNow) {
+        mIsSlashNow = isSlashNow;
+    }
+
+    public boolean isSlashNow() {
+        return mIsSlashNow;
+    }
+
 
 }

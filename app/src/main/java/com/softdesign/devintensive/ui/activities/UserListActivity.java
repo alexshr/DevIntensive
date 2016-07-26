@@ -33,7 +33,6 @@ import com.softdesign.devintensive.data.storage.tasks.LoadUserListFromDbTask;
 import com.softdesign.devintensive.data.storage.tasks.SaveUserOrdersInDbTask;
 import com.softdesign.devintensive.services.DownloadDataService;
 import com.softdesign.devintensive.ui.adapters.UserListAdapter;
-import com.softdesign.devintensive.ui.fragments.UserListRetainFragment;
 import com.softdesign.devintensive.utils.BorderedCircleTransform;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.Utils;
@@ -48,7 +47,9 @@ public class UserListActivity extends BaseManagerActivity {
 
     private static final String LOG_TAG = ConstantManager.LOG_TAG + "_UserListActivity";
 
-    private static final String TAG_RETAIN_FRAGMENT = "rf";
+    //private static final String TAG_RETAIN_FRAGMENT = "rf";
+    private static final String KEY_FILTER = "KEY_FILTER";
+    private static final String KEY_SEARCH_EXPANDED = "KEY_SEARCH_EXPANDED";
 
 
     private DataManager mDataManager;
@@ -69,15 +70,25 @@ public class UserListActivity extends BaseManagerActivity {
     @BindView(R.id.splash)
     LinearLayout mSplash;
 
+    private List<User> mUserList;
 
-    private UserListRetainFragment mRetainFragment;
+    private String mFilter;
+
+    //тут данные больше не храню!!!!
+    //беру прямо из базы
+    //потому что она может, например, актуализироваться сервером по расписанию
+    //private UserListRetainFragment mRetainFragment;
 
     private final ChronosConnector mChronosConnector = new ChronosConnector();
-    private List<User> mUsers;
+
     private int currTask;
     private PreferencesManager mPrefManager;
 
     private boolean mIsUserOrderChanged;
+
+    private boolean mIsSearchExpanded;
+
+    private SearchView mSearchView;
 
 
     @Override
@@ -85,15 +96,12 @@ public class UserListActivity extends BaseManagerActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list);
 
+        if (savedInstanceState != null) {
+            mFilter = savedInstanceState.getString(KEY_FILTER);
+            mIsSearchExpanded = savedInstanceState.getBoolean(KEY_SEARCH_EXPANDED);
+        }
 
         ButterKnife.bind(this);
-
-        mRetainFragment = (UserListRetainFragment) getSupportFragmentManager().findFragmentByTag(TAG_RETAIN_FRAGMENT);
-        if (mRetainFragment == null) {
-            mRetainFragment = new UserListRetainFragment();
-            getSupportFragmentManager().beginTransaction().add(mRetainFragment, TAG_RETAIN_FRAGMENT).commit();
-            Log.d(LOG_TAG, "retainFragment added");
-        }
 
 
         mChronosConnector.onCreate(this, savedInstanceState);
@@ -118,7 +126,7 @@ public class UserListActivity extends BaseManagerActivity {
                 final int toPos = target.getAdapterPosition();
                 mIsUserOrderChanged = true;
 
-                mUsers.add(toPos, mUsers.remove(fromPos));
+                getUserList().add(toPos, getUserList().remove(fromPos));
                 mUserListAdapter.notifyItemMoved(fromPos, toPos);
 
                 return true;
@@ -127,14 +135,13 @@ public class UserListActivity extends BaseManagerActivity {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                mUsers.remove(position);
+                getUserList().remove(position);
                 mUserListAdapter.notifyDataSetChanged();
                 mIsUserOrderChanged = true;
 
             }
         });
         itemTouchHelper.attachToRecyclerView(mRecyclerView);
-
 
     }
 
@@ -151,29 +158,20 @@ public class UserListActivity extends BaseManagerActivity {
         mSplash.setVisibility(View.GONE);
     }
 
-    // отображение локального списка
+    /**
+     * лок данные берутся из базы каждый раз
+     * хранить их в retain fragment неверно
+     * потому что например сервис по расписанию обновит данные,
+     * и мы тут об этом узнаем, а в retain fragment - нет
+     */
     @Override
     public void showData() {
         Log.d(LOG_TAG, "showData started");
-        showProgress();
 
-
-        if (mRetainFragment.getUserList() == null) {
-            Log.d(LOG_TAG, "mRetainFragment userList=null");
-            //проверяем наличие данных
-            //получаем полный список с выбранной сортировкой
-            //поток запускаем в chronos
-
-            //до нового запуска приложения строку поиска пока не храню
-            mChronosConnector.runOperation(
-                    new LoadUserListFromDbTask(mRetainFragment.getNameFilter()), false);
-
-
-        } else {
-            mUsers = mRetainFragment.getUserList();
-            showUserList(mUsers);
-
-        }
+        //получаем полный список с выбранной сортировкой
+        //поток запускаем в chronos
+        mChronosConnector.runOperation(
+                new LoadUserListFromDbTask(mFilter), false);
     }
 
     @Override
@@ -209,11 +207,15 @@ public class UserListActivity extends BaseManagerActivity {
 
     }
 
-
     @Override
     protected void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
         mChronosConnector.onSaveInstanceState(outState);
+        //search filter
+        outState.putString(KEY_FILTER, mFilter);
+        //search view state
+        outState.putBoolean(KEY_SEARCH_EXPANDED, !mSearchView.isIconified());
+
 
     }
 
@@ -243,7 +245,7 @@ public class UserListActivity extends BaseManagerActivity {
         if (mIsUserOrderChanged) {
             mPrefManager.saveIsUserListOrderChanged(true);
             mChronosConnector.runOperation(
-                    new SaveUserOrdersInDbTask(mUsers), false);
+                    new SaveUserOrdersInDbTask(getUserList()), false);
         }
 
     }
@@ -255,9 +257,17 @@ public class UserListActivity extends BaseManagerActivity {
         MenuItem searchMenuItem = menu.findItem(R.id.search);
         //searchMenuItem.collapseActionView();
 
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
-        searchView.setQueryHint(getString(R.string.enter_user_name));
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+        mSearchView.setQueryHint(getString(R.string.enter_user_name));
+
+        if (mIsSearchExpanded) {
+            searchMenuItem.expandActionView();
+        }
+        if (mFilter != null && mFilter.length() > 0) {
+            mSearchView.setQuery(mFilter, false);
+        }
+
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -266,24 +276,14 @@ public class UserListActivity extends BaseManagerActivity {
             @Override
             public boolean onQueryTextChange(final String newText) {
                 //ввели новый символ - отменяем поиск и запускаем актуальный
-                mRetainFragment.setNameFilter(newText.trim());
+                mFilter = newText.trim();
                 if (mChronosConnector.isOperationRunning(currTask)) {
                     mChronosConnector.cancelOperation(currTask, true);
                 }
-                currTask = mChronosConnector.runOperation(new LoadUserListFromDbTask(newText), false);
+                currTask = mChronosConnector.runOperation(new LoadUserListFromDbTask(mFilter), false);
                 return true;
             }
         });
-
-        String filter=mRetainFragment.getNameFilter();
-        if(filter!=null&&filter.length()>0){
-            searchView.setIconified(false);
-            searchMenuItem.expandActionView();
-            searchView.setQuery(filter,true);
-        }
-
-
-
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -314,6 +314,9 @@ public class UserListActivity extends BaseManagerActivity {
                 return true;
             case R.id.refresh:
                 downloadData();
+                return true;
+            case R.id.search:
+                mIsSearchExpanded = item.isActionViewExpanded();
                 return true;
         }
 
@@ -374,7 +377,7 @@ public class UserListActivity extends BaseManagerActivity {
         Log.d(LOG_TAG, "showUserList count=" + users.size());
 
         if (mUserListAdapter == null) {
-            mUsers = users;
+            setUserList(users);
             mUserListAdapter = new UserListAdapter(users, new UserListAdapter.UserViewHolder.UserItemClickListener() {
                 @Override
                 public void onUserItemClick(int adapterPosition) {
@@ -400,6 +403,14 @@ public class UserListActivity extends BaseManagerActivity {
         mNavigationView.getMenu().getItem(0).setChecked(true);
     }
 
+    public List<User> getUserList() {
+        return mUserList;
+    }
+
+    public void setUserList(List<User> userList) {
+        mUserList = userList;
+    }
+
     /**
      * chronos
      *
@@ -409,8 +420,7 @@ public class UserListActivity extends BaseManagerActivity {
 
         Log.d(LOG_TAG, "onOperationFinished result result.isSuccessful() " + result.isSuccessful() + " count=" + result.getOutput().size());
         if (result.isSuccessful()) {
-            mUsers = result.getOutput();
-            showUserList(mUsers);
+            showUserList(result.getOutput());
         } else {
             showErrorMes(result.getErrorMessage());
         }
