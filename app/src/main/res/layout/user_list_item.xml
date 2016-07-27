@@ -5,9 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:http="http://schemas.android.com/tools"
-    android:layout_marginTop="@dimen/spacing_small_8"
-    app:cardBackgroundColor="@android:color/white"
-    app:cardCornerRadius="@dimen/card_corner_radius">
+    android:layout_marginTop="@dimen/spacing_8"
+    app:cardBackgroundColor="@color/white_card"
+    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:cardElevation="@dimen/item_user_list_card_elevation"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,120 +33,42 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:paddingBottom="@dimen/spacing_medium_24"
-                android:paddingLeft="@dimen/spacing_normal_16"
-                android:paddingRight="@dimen/spacing_normal_16"
+                android:paddingBottom="@dimen/user_list_item_name_padding_b"
+                android:paddingLeft="@dimen/user_list_item_name_padding_h"
+                android:paddingRight="@dimen/user_list_item_name_padding_h"
                 android:text="Имя Фамилия"
-                android:textColor="@color/white"
+                android:textColor="@color/white_card"
                 android:textSize="@dimen/user_list_item_name_text_size"/>
 
         </FrameLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/size_large_72"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.25"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/rating_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/header_rating_vol"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/user_list_item_rating_text_size"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/header_rating"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/user_list_item_rating_caption_text_size"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/code_lines_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/header_code_strings_vol"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/user_list_item_rating_text_size"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/header_code_strings"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/user_list_item_rating_caption_text_size"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.25"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/projects_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/header_projects_vol"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/user_list_item_rating_text_size"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/header_projects"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/user_list_item_rating_caption_text_size"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
+        <include layout="@layout/user_list_item_ratings"/>
 
         <TextView
             android:id="@+id/bio_txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="3"
-            android:paddingLeft="@dimen/spacing_normal_16"
-            android:paddingRight="@dimen/spacing_normal_16"
-            android:text="@string/contacts_about_vol"
-            android:textColor="@color/grey_light"
+            android:paddingLeft="@dimen/user_list_item_bio_padding_h"
+            android:paddingRight="@dimen/user_list_item_bio_padding_h"
+            android:text="@string/contacts_test_about_vol"
+            android:textColor="@color/color_grey_light"
             android:textSize="@dimen/user_list_item_bio_text_size"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/line_size"
-            android:layout_marginBottom="@dimen/spacing_small_8"
-            android:layout_marginTop="@dimen/spacing_normal_16"
-            android:background="@color/grey_light"/>
+            android:layout_marginBottom="@dimen/user_list_item_divider_margin_b"
+            android:layout_marginTop="@dimen/user_list_item_divider_margin_t"
+            android:background="@color/color_grey_light"/>
 
         <Button
             android:id="@+id/more_info_btn"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/spacing_normal_16"
-            android:paddingRight="@dimen/spacing_normal_16"
+            android:paddingLeft="@dimen/user_list_item_button_padding_h"
+            android:paddingRight="@dimen/user_list_item_button_padding_h"
             android:text="@string/show_details"
             android:textColor="@color/color_accent"/>
 

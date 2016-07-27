@@ -3,7 +3,7 @@
 
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
+              android:layout_height="wrap_content"
               android:orientation="vertical">
 
     <LinearLayout style="@style/outer_layout">
@@ -12,14 +12,16 @@
             style="@style/user_info_icon.left"
             android:src="@drawable/ic_call_black_24dp"/>
 
-        <LinearLayout style="@style/inner_layout"
-            >
+        <LinearLayout style="@style/inner_layout">
 
             <com.softdesign.devintensive.ui.views.ValidatedTextInputLayout
                 android:id="@+id/phone_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:captionTextAppearance="@style/user_info_hint_textAppearance"
+                app:errorTextAppearance="@style/user_info_error_textAppearance"
                 app:errorHint="@string/hint_input_phone"
+                app:errorMessage="@string/error_input_phone"
                 app:regexp="@string/regexp_phone">
 
                 <android.support.design.widget.TextInputEditText
@@ -30,7 +32,8 @@
                     android:focusable="false"
                     android:hint="@string/contacts_mobile"
                     android:inputType="phone"
-                    android:text="@string/contacts_mobile_vol"/>
+                    android:digits="0123456789+- "
+                    android:text="@string/contacts_test_mobile_vol"/>
 
             </com.softdesign.devintensive.ui.views.ValidatedTextInputLayout>
 
@@ -58,7 +61,10 @@
                 android:id="@+id/email_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:captionTextAppearance="@style/user_info_hint_textAppearance"
+                app:errorTextAppearance="@style/user_info_error_textAppearance"
                 app:errorHint="@string/hint_input_mail"
+                app:errorMessage="@string/error_input_mail"
                 app:regexp="@string/regexp_email">
 
                 <android.support.design.widget.TextInputEditText
@@ -68,7 +74,7 @@
                     android:focusable="false"
                     android:hint="@string/contacts_email"
                     android:inputType="textEmailAddress"
-                    android:text="@string/contacts_email_vol"/>
+                    android:text="@string/contacts_test_email_vol"/>
 
             </com.softdesign.devintensive.ui.views.ValidatedTextInputLayout>
 
@@ -96,17 +102,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:errorHint="@string/hint_input_vk"
-                app:prefix="https://"
+                app:errorMessage="@string/error_input_vk"
+                app:isToRemoveHttpPrefix="true"
                 app:regexp="@string/regexp_vk">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/vk_edit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:captionTextAppearance="@style/user_info_hint_textAppearance"
+                    app:errorTextAppearance="@style/user_info_error_textAppearance"
                     android:focusable="false"
                     android:hint="@string/contacts_vk"
                     android:inputType="textUri"
-                    android:text="@string/contacts_vk_vol"/>
+                    android:text="@string/contacts_test_vk_vol"/>
 
             </com.softdesign.devintensive.ui.views.ValidatedTextInputLayout>
 
@@ -133,8 +142,11 @@
                 android:id="@+id/github_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:captionTextAppearance="@style/user_info_hint_textAppearance"
+                app:errorTextAppearance="@style/user_info_error_textAppearance"
                 app:errorHint="@string/hint_input_github"
-                app:prefix="https://"
+                app:errorMessage="@string/error_input_github"
+                app:isToRemoveHttpPrefix="true"
                 app:regexp="@string/regexp_github">
 
                 <android.support.design.widget.TextInputEditText
@@ -144,7 +156,8 @@
                     android:focusable="false"
                     android:hint="@string/contacts_repo"
                     android:inputType="textUri"
-                    android:text="@string/contacts_repo_vol"/>
+
+                    android:text="@string/contacts_test_repo_vol"/>
 
             </com.softdesign.devintensive.ui.views.ValidatedTextInputLayout>
 
@@ -178,10 +191,12 @@
                     android:id="@+id/about_edit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:hintTextAppearance="@style/user_info_hint_textAppearance"
+                    app:errorTextAppearance="@style/user_info_error_textAppearance"
                     android:focusable="false"
                     android:hint="@string/contacts_about"
                     android:inputType="textMultiLine|textAutoCorrect|textCapSentences"
-                    android:text="@string/contacts_about_vol"/>
+                    android:text="@string/contacts_test_about_vol"/>
 
             </com.softdesign.devintensive.ui.views.ValidatedTextInputLayout>
 

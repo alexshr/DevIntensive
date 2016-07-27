@@ -11,12 +11,15 @@ import com.softdesign.devintensive.R;
 
 import java.util.List;
 
-public class RepositoriesAdapter extends BaseAdapter {
+/**
+ * adapter for repository list
+ */
+public class RepositoryListAdapter extends BaseAdapter {
     private Context mContext;
     private List<String> mRepoList;
     private LayoutInflater mInflater;
 
-    public RepositoriesAdapter(Context context, List<String> repoList) {
+    public RepositoryListAdapter(Context context, List<String> repoList) {
         mContext = context;
         mRepoList = repoList;
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

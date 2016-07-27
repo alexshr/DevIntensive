@@ -7,7 +7,14 @@ import android.widget.ImageView;
 
 import com.softdesign.devintensive.R;
 
+
+/**
+ * custom image view with constant height/width ratio
+ *
+ */
 public class AspectRatioImageView extends ImageView {
+
+//TODO add attr for ratio
 
     public static final float ASPECT_RATIO = 1.78f;
 

@@ -8,83 +8,61 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.softdesign.devintensive.ui.activities.MainActivity">
+    tools:context=".ui.activities.HostProfileActivity">
 
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/main_coordinator_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        android:layout_height="match_parent"
+        >
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            android:theme="@style/AppTheme.AppBarOverlay">
 
             <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fitsSystemWindows="true"
-                app:contentScrim="@color/color_primary"
-                app:expandedTitleTextAppearance="@android:style/TextAppearance.Large"
+                app:contentScrim="@color/color_grey"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
-
 
                 <!-- Photo -->
                 <include layout="@layout/activity_main_profile_photo"/>
 
-                <!--
-                <ImageView
-                    android:id="@+id/toolbar_image_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/profile_image_size"
-                    android:fitsSystemWindows="true"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/user_photo"
-                    app:layout_collapseMode="parallax"/>
--->
+
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     app:layout_collapseMode="pin"
-                    app:theme="@style/ThemeOverlay.AppCompat.Light"
-                    app:titleTextColor="@android:color/white"/>
+                    app:theme="@style/AppTheme.PopupOverlay"/>                 />
 
             </android.support.design.widget.CollapsingToolbarLayout>
 
         </android.support.design.widget.AppBarLayout>
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             android:orientation="vertical"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            app:layout_behavior=".ui.behaviors.CustomScrollingBehavior"            >
 
             <include layout="@layout/user_ratings"/>
 
             <android.support.v4.widget.NestedScrollView
                 android:id="@+id/scroll_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                tools:context=".ui.activities.MainActivity">
+                tools:context=".ui.activities.HostProfileActivity">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-
-                    <include layout="@layout/user_info"/>
-                </LinearLayout>
+                <include layout="@layout/user_info"/>
 
             </android.support.v4.widget.NestedScrollView>
-
         </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton
@@ -97,7 +75,6 @@
             app:layout_anchorGravity="bottom|right"/>
 
     </android.support.design.widget.CoordinatorLayout>
-
 
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation_view"

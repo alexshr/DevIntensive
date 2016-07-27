@@ -8,64 +8,78 @@
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
         <item name="colorAccent">@color/color_accent</item>
-
+        <item name="textColorError">@color/color_accent</item>
         <!-- Remove EditText bottom line in disabled mode -->
         <item name="colorControlNormal">@android:color/white</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
 
 
-    <!--user_rating-->
+    <!--for icons-->
     <style name="user_info_icon">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">@dimen/spacing_medium_24</item>
+        <item name="android:layout_marginTop">@dimen/spacing_24</item>
     </style>
 
     <style name="user_info_icon.left">
         <item name="android:layout_gravity">top|left</item>
-        <item name="android:layout_marginLeft">@dimen/spacing_normal_16</item>
+        <item name="android:layout_marginLeft">@dimen/spacing_16</item>
     </style>
 
     <style name="user_info_icon.right">
         <item name="android:layout_gravity">top|right</item>
-        <item name="android:layout_marginRight">@dimen/spacing_medium_32</item>
+        <item name="android:layout_marginRight">@dimen/spacing_32</item>
     </style>
 
+
+    <!-- for ratings panels-->
     <style name="user_rating_textAppearance">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">@dimen/user_rating_value_text_size</item>
     </style>
 
-    <style name="user_rating_textAppearance.caption">
+    <style name="user_rating_caption_textAppearance">
+        <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">@dimen/user_rating_caption_text_size</item>
     </style>
 
-    <style name="textInputLayout_error" parent="TextAppearance.Design.Hint">
-        <item name="android:fontFamily">sans-serif-condensed</item>
-        <item name="android:textSize">13sp</item>
+    <style name="user_list_item_rating_textAppearance">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">@dimen/user_rating_value_text_size</item>
     </style>
 
-    <!-- user_info -->
+    <style name="user_list_item_rating_caption_textAppearance">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">@dimen/user_rating_caption_text_size</item>
+    </style>
+
+
+    <!-- for user_info -->
+    <style name="user_info_error_textAppearance" parent="TextAppearance.Design.Error"/>
+
+    <style name="user_info_hint_textAppearance" parent="TextAppearance.Design.Hint">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
     <style name="outer_layout">
-        <item name="android:layout_marginBottom">@dimen/spacing_small_8</item>
-        <item name="android:layout_marginTop">@dimen/spacing_small_8</item>
+        <item name="android:layout_marginBottom">@dimen/spacing_8</item>
+        <item name="android:layout_marginTop">@dimen/spacing_8</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">horizontal</item>
     </style>
 
-
     <style name="inner_layout">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
 
-        <item name="android:layout_marginLeft">@dimen/spacing_medium_32</item>
-        <item name="android:layout_marginRight">@dimen/spacing_normal_16</item>
+        <item name="android:layout_marginLeft">@dimen/spacing_32</item>
+        <item name="android:layout_marginRight">@dimen/spacing_16</item>
         <item name="android:layout_weight">1</item>
         <item name="android:gravity">bottom</item>
         <item name="android:orientation">vertical</item>
@@ -74,32 +88,16 @@
     <style name="divider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/line_size</item>
-        <item name="android:layout_marginLeft">@dimen/spacing_larger_72</item>
-        <item name="android:background">@color/grey_light</item>
+        <item name="android:layout_marginLeft">@dimen/spacing_72</item>
+        <item name="android:background">@color/color_grey_light</item>
     </style>
 
 
     <!--drawer header-->
-
     <style name="drawer_header">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@android:color/white</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-    </style>
-
-
-   <!--activity_auth-->
-
-    <style name="auth_hint_textappearance" parent="TextAppearance.Design.Hint">
-        <item name="android:textSize">@dimen/auth_hint_text_size</item>
-        <item name="android:textColor">@color/auth_textinputlayout_hint</item>
-        <item name="android:fontFamily" tools:targetApi="jelly_bean">@string/font_condensed</item>
-    </style>
-
-    <style name="auth_edit_textappearance">
-        <item name="android:textColor">@color/auth_edittext</item>
-        <item name="android:textSize">@dimen/auth_edit_text_size</item>
-        <item name="android:fontFamily" tools:targetApi="jelly_bean">@string/font_condensed</item>
     </style>
 
     <style name="drawer_header.user_name" parent="drawer_header">
@@ -110,9 +108,24 @@
         <item name="android:fontFamily" tools:targetApi="jelly_bean">sans-serif-condensed</item>
     </style>
 
+    <!--login form-->
+    <style name="auth_edit_textappearance">
+        <item name="android:textSize">@dimen/auth_edit_text_size</item>
+        <item name="android:fontFamily" tools:targetApi="jelly_bean">@string/font_condensed</item>
+    </style>
+
+    <!--for fullscreen login fragment-->
+    <style name="fragment_fullscreen">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
+
+    <!--for user_profile-->
     <style name="outer_line_layout_element">
-        <item name="android:layout_marginBottom">@dimen/spacing_small_8</item>
-        <item name="android:layout_marginTop">@dimen/spacing_small_8</item>
+        <item name="android:layout_marginBottom">@dimen/spacing_8</item>
+        <item name="android:layout_marginTop">@dimen/spacing_8</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">horizontal</item>
@@ -121,44 +134,39 @@
     <style name="inner_line_layout_element">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:minHeight">@dimen/size_large_72</item>
-        <item name="android:layout_marginLeft">@dimen/spacing_medium_32</item>
-        <item name="android:layout_marginRight">@dimen/spacing_normal_16</item>
+        <item name="android:minHeight">@dimen/size_72</item>
+        <item name="android:layout_marginLeft">@dimen/spacing_32</item>
+        <item name="android:layout_marginRight">@dimen/spacing_16</item>
         <item name="android:layout_weight">1</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:orientation">vertical</item>
     </style>
 
-    <style name="text_edit_element">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:enabled">false</item>
-        <item name="android:focusable">false</item>
-        <item name="android:textColor">@android:color/black</item>
-        <item name="android:textColorHint">@color/grey</item>
-        <item name="android:textSize">@dimen/text_size_16</item>
-        <item name="android:fontFamily" tools:targetApi="jelly_bean">sans-serif-condensed</item>
-    </style>
-
     <style name="user_profile_toolbar_style" parent="Theme.AppCompat">
-        <item name="android:textColorPrimary">@color/white</item>
-        <item name="android:textColorSecondary">@color/white</item>
-        <item name="android:actionMenuTextColor">@color/white</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorSecondary">@android:color/white</item>
+        <item name="android:actionMenuTextColor">@android:color/white</item>
     </style>
 
 
     <!-- Contacts page header text style -->
+
     <style name="header_text">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:gravity">center_horizontal</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:fontFamily" tools:targetApi="jelly_bean">sans-serif-condensed</item>
     </style>
 
     <!-- Contacts page header big text style -->
     <style name="header_text.large">
         <item name="android:textSize">@dimen/text_size_20</item>
     </style>
+
+    <style name="progress_screen">
+        <item name="android:fullDark">@android:color/transparent</item>
+    </style>
+
 
 </resources>

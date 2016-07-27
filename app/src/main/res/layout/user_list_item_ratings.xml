@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/user_ratings"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/user_list_item_ratings_padding_v"
+    android:paddingTop="@dimen/user_list_item_ratings_padding_v">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="@dimen/rating_layout_height"
+        android:layout_weight="0.25"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/header_test_rating_vol"
+            android:textAppearance="@style/user_list_item_rating_textAppearance"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/header_rating"
+            android:textAppearance="@style/user_list_item_rating_caption_textAppearance"/>
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="@dimen/user_ratings_info_layout_height"
+        android:layout_weight="0.5"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/lines"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/header_test_code_strings_vol"
+            android:textAppearance="@style/user_list_item_rating_textAppearance"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/header_code_strings"
+            android:textAppearance="@style/user_list_item_rating_caption_textAppearance"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+
+        android:layout_width="0dp"
+        android:layout_height="@dimen/user_ratings_info_layout_height"
+        android:layout_weight="0.25"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/projects"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/header_test_projects_vol"
+            android:textAppearance="@style/user_list_item_rating_textAppearance"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/header_projects"
+            android:textAppearance="@style/user_list_item_rating_caption_textAppearance"/>
+    </LinearLayout>
+
+</LinearLayout>
+

@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -27,11 +28,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -39,9 +39,12 @@ import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.managers.PreferencesManager;
+import com.softdesign.devintensive.services.DownloadDataService;
 import com.softdesign.devintensive.ui.views.ValidatedTextInputLayout;
 import com.softdesign.devintensive.utils.BorderedCircleTransform;
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.softdesign.devintensive.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -64,7 +67,11 @@ import static com.softdesign.devintensive.utils.ConstantManager.REQUEST_PERMISSI
 import static com.softdesign.devintensive.utils.ConstantManager.REQUEST_PERMISSIONS_READ_SDCARD_SETTINGS;
 import static com.softdesign.devintensive.utils.Utils.createImageFile;
 
-public class MainActivity extends BaseActivity {
+/**
+ * окно профиля залогинившегося пользователя
+ * вся логика работы полей ввода, включая валидацию, подсказки и пр перенесены в custom view
+ */
+public class HostProfileActivity extends BaseManagerActivity {
 
 
     private static String LOG_TAG = ConstantManager.LOG_TAG;
@@ -123,11 +130,16 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.about_layout)
     ValidatedTextInputLayout mUserAboutLayout;
 
+    @BindView(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout mCollapsingToolbar;
+
+
     // edit mode
     private boolean mIsEditMode;
 
 
     private DataManager mDataManager = DataManager.getInstance();
+    private PreferencesManager mPrefManager = mDataManager.getPreferencesManager();
 
     //file from camera
     private File mPhotoFile = null;
@@ -147,7 +159,7 @@ public class MainActivity extends BaseActivity {
                         //all is valid
                         saveUserInfo();
                         mIsEditMode = !mIsEditMode;
-                        mAppBarLayout.setExpanded(false);
+                        //mAppBarLayout.setExpanded(false);
                     }
                 } else {
                     mIsEditMode = !mIsEditMode;
@@ -159,32 +171,23 @@ public class MainActivity extends BaseActivity {
                 showDialog(ConstantManager.LOAD_PROFILE_PHOTO);
                 break;
             case R.id.call_img:
-                Intent makeCall = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", mUserPhoneLayout.getTextForIntent(), null));
+                Intent makeCall = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", mUserPhoneLayout.getText(), null));
                 startActivity(makeCall);
                 break;
             case R.id.email_img:
-                Intent sendEmail = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", mUserMailLayout.getTextForIntent(), null));
+                Intent sendEmail = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", mUserPhoneLayout.getText(), null));
                 startActivity(sendEmail);
                 break;
             case R.id.vk_img:
-                Intent openVK = new Intent(Intent.ACTION_VIEW, Uri.parse("https://" + mUserVkLayout.getTextForIntent()));
+                Intent openVK = new Intent(Intent.ACTION_VIEW, Uri.parse("https://" + mUserPhoneLayout.getText()));
                 startActivity(openVK);
                 break;
             case R.id.repo_img:
-                Intent openGitHub = new Intent(Intent.ACTION_VIEW, Uri.parse("https://" + mUserGithub.getTextForIntent()));
+                Intent openGitHub = new Intent(Intent.ACTION_VIEW, Uri.parse("https://" + mUserPhoneLayout.getText()));
                 startActivity(openGitHub);
                 break;
         }
     }
-
-
-    /**
-     * validate
-     */
-    private boolean validateInput() {
-        return getFirstErrorInput() == null;
-    }
-
 
     /**
      * determine first error field
@@ -226,65 +229,78 @@ public class MainActivity extends BaseActivity {
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_host_profile);
+
+
         ButterKnife.bind(this);
 
-///////////////////////////////////////////////////////////
-        /*
-        сворачивание плашки (простейшее решение!)
-        синхронизируем 1:1 величину паддинга плашки с величиной развертывания AppBarLayout,
-        но только на интервале, в котором может изменяться padding.
-        */
-        mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            int scrollRange = -1;
-            int maxPadding = mUserRatingLayout.getResources().getDimensionPixelSize(R.dimen.spacing_medium_28);
-
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-
-                if (scrollRange == -1) {
-                    scrollRange = appBarLayout.getTotalScrollRange();
-                }
-
-                int pos = scrollRange + verticalOffset;
-
-                int padding = (pos >= maxPadding ? maxPadding : pos);
-                mUserRatingLayout.setPadding(0, padding, 0, padding);
-
-                Log.d(LOG_TAG, "AppBarLayout scrollRange=" + mAppBarLayout.getTotalScrollRange() + " verticalOffset=" + verticalOffset + " padding=" + padding);
-            }
-        });
-////////////////////////////////////////////////
 
         setupToolbar();
 
         setupDrawer();
 
+
         if (savedInstanceState != null) {
             // recreating activity
             mIsEditMode = savedInstanceState.getBoolean(ConstantManager.EDIT_MODE_KEY, false);
             //loadUserInfoValue();
-        } else {
-            // first starting of the activity
-            loadUserInfoValue();
+        }
+    }
+
+    @Override
+    public void showData() {
+        Log.d(LOG_TAG, "showData started");
+        super.showData();
+        List<String> userData = mDataManager.getPreferencesManager().loadUserProfileData();
+        for (int i = 0; i < userData.size(); i++) {
+            mEditLayoutList.get(i).setText(userData.get(i));
         }
 
+        userData = mDataManager.getPreferencesManager().loadUserProfileValues();
+        for (int i = 0; i < userData.size(); i++) {
+            mValueList.get(i).setText(userData.get(i));
+        }
         prepareViewsForMode();
 
         // photo from server
         placeProfilePicture(mDataManager.getPreferencesManager().getPhotoUri());
 
+        postEvent(MES_SHOW_FINISHED);
+    }
+
+    @Override
+    public void showErrorMes(String mes) {
+        Utils.showErrorOnSnackBar(mCoordinatorLayout, mes);
+    }
+
+    @Override
+    public void showInfoMes(String mes) {
+        Utils.showInfoOnSnackBar(mCoordinatorLayout, mes);
+    }
+
+
+    @Override
+    public void downloadData() {
+        Log.d(LOG_TAG, "downloadData started");
+        super.downloadData();
+        if (mPrefManager.getLogin().isEmpty()) {
+            //отправляемся спрашивать у пользователя логин и пароль
+            postEvent(BaseManagerActivity.MES_USER_NOT_AUTHORIZED);
+        } else {
+            //идем за профайлом и токеном
+            DownloadDataService.startActionTokenAndProfile(this, mPrefManager.getLogin(), mPrefManager.getPassword());
+        }
     }
 
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
             case ConstantManager.LOAD_PROFILE_PHOTO:
-                String[] selectedItems = getResources().getStringArray(R.array.profile_placeHolder_loadPhotoDialog);
+                String[] selectedItems = getResources().getStringArray(R.array.photo_dialog_choices);
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getString(R.string.change_profile_photo));
                 builder.setItems(selectedItems, new DialogInterface.OnClickListener() {
@@ -310,9 +326,18 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.host_profile, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             mNavigationDrawer.openDrawer(GravityCompat.START);
+            return true;
+        } else if (item.getItemId() == R.id.refresh) {
+            downloadData();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -338,6 +363,7 @@ public class MainActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         switch (requestCode) {
+
             case REQUEST_GALLERY_PICTURE:
                 if (resultCode == RESULT_OK && data != null) {
                     mPhotoUri = data.getData();
@@ -346,7 +372,7 @@ public class MainActivity extends BaseActivity {
                     placeProfilePicture(mPhotoUri);
                     uploadImageFile(new File(getPath(mPhotoUri)));
                 }
-                break;
+                return;
             case REQUEST_CAMERA_PICTURE:
                 if (resultCode == RESULT_OK && mPhotoFile != null) {
                     mPhotoUri = Uri.fromFile(mPhotoFile);
@@ -356,19 +382,21 @@ public class MainActivity extends BaseActivity {
                     uploadImageFile(new File(mPhotoUri.getPath()));
 
                 }
-                break;
+                return;
             case REQUEST_PERMISSIONS_CAMERA_SETTINGS:
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
                         ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                     loadPhotoFromCamera();
                 }
-                break;
+                return;
             case REQUEST_PERMISSIONS_READ_SDCARD_SETTINGS:
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                     loadPhotoFromGallery();
                 }
-                break;
+                return;
+
         }
+
     }
 
     /**
@@ -465,18 +493,14 @@ public class MainActivity extends BaseActivity {
     }
 
     private void placeProfilePicture(Uri selectedImage) {
+
         Picasso.with(this)
                 .load(selectedImage)
-                //.resize(mProfileImageSize, mProfileImageSize)
-                //.centerInside()
+                .resize(mProfileImageSize, mProfileImageSize)
+                .centerCrop()
                 .placeholder(R.drawable.user_bg)
                 .into(mUserPhotoImg);
 
-    }
-
-
-    private void showSnackBar(String message) {
-        Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG).show();
     }
 
     private void setupToolbar() {
@@ -486,35 +510,27 @@ public class MainActivity extends BaseActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        mCollapsingToolbar.setTitle(mDataManager.getPreferencesManager().getUserName());
+
     }
 
     private void setupDrawer() {
         final NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        assert navigationView != null;
+        navigationView.getMenu().getItem(1).setChecked(true);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.profile:
-                        /*
-                        Intent intent = new Intent(UserListActivity.this, UserListActivity.class) ;
-                        startActivity(intent);
-                        finish();
-                        */
-                        break;
                     case R.id.team:
-                        Intent intent = new Intent(MainActivity.this, UserListActivity.class) ;
+                        Intent intent = new Intent(HostProfileActivity.this, UserListActivity.class);
                         startActivity(intent);
                         finish();
                         break;
                     case R.id.logout:
                         logout();
                         break;
-                    default:
-                        showSnackBar(item.getTitle().toString());
-                        item.setChecked(true);
                 }
-
+                item.setChecked(true);
                 mNavigationDrawer.closeDrawer(GravityCompat.START);
                 return false;
             }
@@ -533,11 +549,11 @@ public class MainActivity extends BaseActivity {
 
         //show user name and email
         TextView userNameView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_name);
-        String userName=mDataManager.getPreferencesManager().getUserName();
+        String userName = mDataManager.getPreferencesManager().getUserName();
         userNameView.setText(userName);
 
         TextView userEmailView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_email);
-        String email=mDataManager.getPreferencesManager().getEmail();
+        String email = mDataManager.getPreferencesManager().getEmail();
         userEmailView.setText(email);
 
 
@@ -583,29 +599,14 @@ public class MainActivity extends BaseActivity {
         requestFocus();
     }
 
-    private void loadUserInfoValue() {
-        List<String> userData = mDataManager.getPreferencesManager().loadUserProfileData();
-        for (int i = 0; i < userData.size(); i++) {
-            mEditLayoutList.get(i).getEditText().setText(userData.get(i));
-        }
-
-        userData = mDataManager.getPreferencesManager().loadUserProfileValues();
-        for (int i = 0; i < userData.size(); i++) {
-            mValueList.get(i).setText(userData.get(i));
-        }
-    }
 
     private void saveUserInfo() {
         List<String> userData = new ArrayList<>();
         for (ValidatedTextInputLayout userInfoView : mEditLayoutList) {
-            userData.add(userInfoView.getTextToStore());
+            userData.add(userInfoView.getText());
         }
         mDataManager.getPreferencesManager().saveUserProfileData(userData);
 
-    }
-
-    private void logout() {
-        startActivity(new Intent(this, LoginActivity.class));
     }
 
 

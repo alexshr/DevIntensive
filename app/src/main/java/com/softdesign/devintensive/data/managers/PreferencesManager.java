@@ -12,6 +12,8 @@ import java.util.List;
 public class PreferencesManager {
     private SharedPreferences mSharedPreferences;
 
+    private static final String LOG_TAG=ConstantManager.LOG_TAG+"_PreferencesManager";
+
     public static final String[] USER_FIELDS = {
             ConstantManager.USER_PHONE_KEY,
             ConstantManager.USER_MAIL_KEY,
@@ -32,7 +34,7 @@ public class PreferencesManager {
     };
 
     public PreferencesManager() {
-        mSharedPreferences = DevApplication.getSharedPreferences();
+        mSharedPreferences = DevApplication.sSharedPreferences;
     }
 
     public void saveUserProfileData(List<String> userFields) {
@@ -47,34 +49,23 @@ public class PreferencesManager {
 
     public String getUserName() {
 
-        String firstName=mSharedPreferences.getString(ConstantManager.USER_FIRST_NAME, " ");
-        String secondName=mSharedPreferences.getString(ConstantManager.USER_SECOND_NAME, " ");
-        return secondName+" "+firstName;
+        String firstName = mSharedPreferences.getString(ConstantManager.USER_FIRST_NAME, " ");
+        String secondName = mSharedPreferences.getString(ConstantManager.USER_SECOND_NAME, " ");
+        return secondName + " " + firstName;
     }
 
 
 
-    //to login automatically
-    public void saveLogin(String login){
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putString(ConstantManager.USER_LOGIN,login);
-    }
-
-    public void savePassword(String pas){
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putString(ConstantManager.USER_PASS,pas);
-    }
-
-    public String getlogin() {
-        return mSharedPreferences.getString(ConstantManager.USER_LOGIN,"");
+    public String getLogin() {
+        return mSharedPreferences.getString(ConstantManager.USER_LOGIN_KEY, "");
     }
 
     public String getPassword() {
-        return mSharedPreferences.getString(ConstantManager.USER_PASS,"");
+        return mSharedPreferences.getString(ConstantManager.USER_PASS_KEY, "");
     }
 
     public String getEmail() {
-        return mSharedPreferences.getString(ConstantManager.USER_MAIL_KEY,"");
+        return mSharedPreferences.getString(ConstantManager.USER_MAIL_KEY, "");
     }
 
     /**
@@ -145,12 +136,6 @@ public class PreferencesManager {
 
 
 
-
-    public Uri getPhotoLocalUri() {
-        return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_PHOTO_LOCAL_URI,
-                ""));
-    }
-
     public Uri getPhotoUri() {
         return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_PHOTO_URI,
                 ""));
@@ -178,7 +163,7 @@ public class PreferencesManager {
      * @return
      */
     public String getAuthToken() {
-        return mSharedPreferences.getString(ConstantManager.AUTH_TOKEN_KEY, "null");
+        return mSharedPreferences.getString(ConstantManager.AUTH_TOKEN_KEY, "");
     }
 
     /**
@@ -192,6 +177,20 @@ public class PreferencesManager {
         editor.apply();
     }
 
+    //to login automatically
+    public void saveLogin(String login) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.USER_LOGIN_KEY, login);
+        editor.apply();
+    }
+
+    public void savePassword(String pass) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.USER_PASS_KEY, pass);
+        editor.apply();
+    }
+
+
     /**
      * fetch userId
      *
@@ -200,4 +199,31 @@ public class PreferencesManager {
     public String getUserId() {
         return mSharedPreferences.getString(ConstantManager.USER_ID_KEY, "null");
     }
+
+
+
+    public void saveIsUserListOrderChanged(boolean isChanged) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putBoolean(ConstantManager.USER_NAME_FILTER, isChanged);
+        editor.apply();
+    }
+
+
+    public void removeAuth() {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.USER_ID_KEY, "");
+        editor.putString(ConstantManager.AUTH_TOKEN_KEY, "");
+        editor.putString(ConstantManager.USER_PASS_KEY, "");
+        editor.putString(ConstantManager.USER_LOGIN_KEY, "");
+        editor.apply();
+    }
+
+    /**
+     * проверяем стоит ли попробовать запрос или немедленно - на авторизацию
+     * @return
+     */
+    public boolean hasTokenOrLogin(){
+        return !getAuthToken().isEmpty()||!getLogin().isEmpty();
+    }
+
 }

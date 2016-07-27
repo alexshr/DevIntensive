@@ -1,8 +1,9 @@
 package com.softdesign.devintensive.ui.adapters;
 
 import android.content.Context;
-import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,31 +11,36 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
-import com.softdesign.devintensive.data.network.res.UserListRes;
+import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.ui.views.AspectRatioImageView;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.Utils;
-import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * adapter for user info list
+ */
 public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserViewHolder> {
 
     private Context mContext;
-    private List<UserListRes.UserData> mUserList;
+    private List<User> mUserList;
     private UserViewHolder.UserItemClickListener mUserItemClickListener;
 
     private int mWidth;
     private int mHeight;
+    private static final String LOG_TAG = ConstantManager.LOG_TAG + "_UserAdapter";
 
-    public UserListAdapter(List<UserListRes.UserData> users, UserViewHolder.UserItemClickListener userItemClickListener) {
+    public UserListAdapter(List<User> users, UserViewHolder.UserItemClickListener userItemClickListener) {
         mUserList = users;
         mUserItemClickListener = userItemClickListener;
     }
 
     @Override
-    public UserListAdapter.UserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public UserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         mContext = parent.getContext();
         View convertView = LayoutInflater.from(mContext).inflate(R.layout.user_list_item, parent, false);
 
@@ -47,30 +53,69 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
     }
 
     @Override
-    public void onBindViewHolder(UserListAdapter.UserViewHolder holder, int position) {
-        UserListRes.UserData user = mUserList.get(position);
+    public void onBindViewHolder(final UserViewHolder holder, int position) {
+
+
+        User user = mUserList.get(position);
 
         holder.mFullName.setText(user.getFullName());
-        holder.mRating.setText(String.valueOf(user.getProfileValues().getRating()));
-        holder.mCodeLines.setText(String.valueOf(user.getProfileValues().getLinesCode()));
-        holder.mProjects.setText(String.valueOf(user.getProfileValues().getProjects()));
+        holder.mRating.setText(user.getRating() + "");
+        holder.mCodeLines.setText(user.getCodeLines() + "");
+        holder.mProjects.setText(user.getProjects() + "");
 
-        if (user.getPublicInfo().getBio() == null || user.getPublicInfo().getBio().isEmpty()) {
+
+
+        if (user.getBio() == null || user.getBio().isEmpty()) {
             holder.mBio.setVisibility(View.GONE);
         } else {
             holder.mBio.setVisibility(View.VISIBLE);
-            holder.mBio.setText(user.getPublicInfo().getBio());
+            holder.mBio.setText(user.getBio());
         }
 
-        String userPhoto = user.getPublicInfo().getPhoto();
 
-        Picasso.with(mContext)
-                .load(userPhoto)
-                .resize(mWidth,mHeight)
-                .centerCrop()
-                .placeholder(mContext.getResources().getDrawable(R.drawable.user_bg))
-                .error(mContext.getResources().getDrawable(R.drawable.user_bg))
-                .into(holder.userPhoto);
+
+
+        String userPhoto = user.getPhoto();
+        if (userPhoto != null && userPhoto.isEmpty()) {
+            userPhoto = "null";
+        } else {
+            final String finalUserPhoto = userPhoto;
+
+            DataManager.getInstance().getPicasso()
+                    .load(userPhoto)
+                    .resize(mWidth, mHeight)  //fit дольше работает, т.к. сам измеряет ImageView, а наш измеренный заранее!!
+                    .centerCrop()
+                    .networkPolicy(NetworkPolicy.OFFLINE)
+                    .error(holder.mDummy)
+                    .placeholder(holder.mDummy)
+                    .into(holder.userPhoto, new Callback() {
+
+                        @Override
+                        public void onSuccess() {
+                            Log.d(LOG_TAG, "load from cache");
+                        }
+
+                        @Override
+                        public void onError() {
+                            DataManager.getInstance().getPicasso()
+                                    .load(finalUserPhoto)
+                                    .fit()
+                                    .centerCrop()
+                                    .error(holder.mDummy)
+                                    .placeholder(holder.mDummy)
+                                    .into(holder.userPhoto, new Callback() {
+                                        @Override
+                                        public void onSuccess() {
+                                        }
+
+                                        @Override
+                                        public void onError() {
+                                            Log.d(LOG_TAG, "Could not fetch image");
+                                        }
+                                    });
+                        }
+                    });
+        }
 
     }
 
@@ -79,13 +124,9 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         return mUserList.size();
     }
 
-    public void setFilter(List<UserListRes.UserData> users) {
-        mUserList = new ArrayList<>();
-        mUserList.addAll(users);
-        notifyDataSetChanged();
-    }
 
-    public UserListRes.UserData getUser(int position) {
+
+    public User getUser(int position) {
         return mUserList.get(position);
     }
 
@@ -94,6 +135,8 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         protected AspectRatioImageView userPhoto;
         protected TextView mFullName, mRating, mCodeLines, mProjects, mBio;
         private Button mShowMore;
+        protected Drawable mDummy;//если нет фото
+
 
         private UserItemClickListener mListener;
 
@@ -103,13 +146,16 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
             userPhoto = (AspectRatioImageView) itemView.findViewById(R.id.user_photo_img);
             mFullName = (TextView) itemView.findViewById(R.id.user_full_name_txt);
-            mRating = (TextView) itemView.findViewById(R.id.rating_txt);
-            mCodeLines = (TextView) itemView.findViewById(R.id.code_lines_txt);
-            mProjects = (TextView) itemView.findViewById(R.id.projects_txt);
+            mRating = (TextView) itemView.findViewById(R.id.rating);
+            mCodeLines = (TextView) itemView.findViewById(R.id.lines);
+            mProjects = (TextView) itemView.findViewById(R.id.projects);
             mBio = (TextView) itemView.findViewById(R.id.bio_txt);
             mShowMore = (Button) itemView.findViewById(R.id.more_info_btn);
 
             mShowMore.setOnClickListener(this);
+
+            mDummy = userPhoto.getContext().getResources().getDrawable(R.drawable.user_bg);
+
         }
 
         @Override
@@ -122,5 +168,14 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         public interface UserItemClickListener {
             void onUserItemClick(int adapterPosition);
         }
+
+
     }
+
+    public void swap(List<User> data) {
+        mUserList.clear();
+        mUserList.addAll(data);
+        notifyDataSetChanged();
+    }
+
 }

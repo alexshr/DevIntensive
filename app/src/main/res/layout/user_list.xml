@@ -4,9 +4,9 @@
     android:id="@+id/user_list"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/spacing_large_56"
+    android:layout_marginTop="@dimen/user_list_margin_top"
     android:orientation="vertical"
-    android:paddingLeft="@dimen/spacing_small_8"
-    android:paddingRight="@dimen/spacing_small_8">
+    android:paddingLeft="@dimen/user_list_padding_h"
+    android:paddingRight="@dimen/user_list_padding_h">
 
 </android.support.v7.widget.RecyclerView>
