@@ -3,8 +3,8 @@ package com.softdesign.devintensive.data.storage.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.softdesign.devintensive.data.network.res.UserListRes;
-import com.softdesign.devintensive.data.network.res.UserModelRes;
+import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.managers.PreferencesManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +21,12 @@ public class UserDTO implements Parcelable {
     private String mProjects;
     private String mBio;
     private List<String> mRepositories;
+    private boolean mIsMyFavorite;
+    private int mLikesByCount;
 
     public UserDTO(User userData) {
+        PreferencesManager mPrefManager= DataManager.getInstance().getPreferencesManager();
+
         List<String> repoList = new ArrayList<>();
 
         mPhoto = userData.getPhoto();
@@ -37,6 +41,14 @@ public class UserDTO implements Parcelable {
             repoList.add(gitLink.getRepositoryName());
         }
         mRepositories = repoList;
+
+
+        for(LikesBy likesBy:userData.getLikesByList()){
+           if(likesBy.getSenderRemoteId()==mPrefManager.getUserId()){
+               mIsMyFavorite=true;
+           }
+            mLikesByCount++;
+        }
 
     }
 
@@ -115,5 +127,13 @@ public class UserDTO implements Parcelable {
 
     public List<String> getRepositories() {
         return mRepositories;
+    }
+
+    public boolean isMyFavorite() {
+        return mIsMyFavorite;
+    }
+
+    public int getLikesByCount() {
+        return mLikesByCount;
     }
 }

@@ -12,8 +12,11 @@ import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.managers.PreferencesManager;
+import com.softdesign.devintensive.data.storage.models.LikesBy;
 import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.ui.views.AspectRatioImageView;
+import com.softdesign.devintensive.ui.views.ToggleImageButton;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.Utils;
 import com.squareup.picasso.Callback;
@@ -27,6 +30,7 @@ import java.util.List;
 public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserViewHolder> {
 
     private Context mContext;
+    private PreferencesManager mPrefManager = DataManager.getInstance().getPreferencesManager();
     private List<User> mUserList;
     private UserViewHolder.UserItemClickListener mUserItemClickListener;
 
@@ -64,7 +68,6 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         holder.mProjects.setText(user.getProjects() + "");
 
 
-
         if (user.getBio() == null || user.getBio().isEmpty()) {
             holder.mBio.setVisibility(View.GONE);
         } else {
@@ -72,7 +75,17 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             holder.mBio.setText(user.getBio());
         }
 
+        int likesByCount = 0;
+        boolean isMyFavorite = false;
 
+        for (LikesBy likesBy : user.getLikesByList()) {
+            if (likesBy.getSenderRemoteId().equals(mPrefManager.getUserId())) {
+                isMyFavorite = true;
+            }
+            likesByCount++;
+        }
+        holder.mLikesByBtn.setChecked(isMyFavorite);
+        holder.mLikesByCount.setText(likesByCount + "");
 
 
         String userPhoto = user.getPhoto();
@@ -125,7 +138,6 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
     }
 
 
-
     public User getUser(int position) {
         return mUserList.get(position);
     }
@@ -136,6 +148,9 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         protected TextView mFullName, mRating, mCodeLines, mProjects, mBio;
         private Button mShowMore;
         protected Drawable mDummy;//если нет фото
+
+        private ToggleImageButton mLikesByBtn;
+        private TextView mLikesByCount;
 
 
         private UserItemClickListener mListener;
@@ -152,30 +167,51 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             mBio = (TextView) itemView.findViewById(R.id.bio_txt);
             mShowMore = (Button) itemView.findViewById(R.id.more_info_btn);
 
-            mShowMore.setOnClickListener(this);
+
 
             mDummy = userPhoto.getContext().getResources().getDrawable(R.drawable.user_bg);
+
+            mLikesByBtn = (ToggleImageButton) itemView.findViewById(R.id.likes_by_btn);
+            mLikesByCount = (TextView) itemView.findViewById(R.id.likes_by_count_txt);
+
+            mShowMore.setOnClickListener(this);
+            mLikesByBtn.setOnClickListener(this);
 
         }
 
         @Override
         public void onClick(View v) {
             if (mListener != null) {
-                mListener.onUserItemClick(getAdapterPosition());
+
+                if (v.getId() == R.id.likes_by_btn) {
+                    int oldVal=Integer.parseInt(mLikesByCount.getText().toString());
+                    int newVal=oldVal;
+                    if(mLikesByBtn.isChecked()){
+                       mLikesByCount.setText(++oldVal+"");
+                    }else{
+                        mLikesByCount.setText(--oldVal+"");
+                    }
+                }
+                mListener.onUserItemClick(getAdapterPosition(), v);
             }
-        }
 
+        }
         public interface UserItemClickListener {
-            void onUserItemClick(int adapterPosition);
+            void onUserItemClick(int adapterPosition, View view);
         }
-
-
     }
+
+
+
+
+
 
     public void swap(List<User> data) {
         mUserList.clear();
         mUserList.addAll(data);
         notifyDataSetChanged();
     }
+
+
 
 }

@@ -20,7 +20,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 /**
- * умеет только выводить неудачный диалог(
+ *
  */
 public abstract class BaseManagerActivity extends AppCompatActivity implements LoginFragment.OnSubmitListener {
 

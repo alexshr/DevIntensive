@@ -46,6 +46,11 @@ public class User {
     })
     private List<Repository> repositories;
 
+    @ToMany(joinProperties = {
+            @JoinProperty(name = "remoteId", referencedName = "recipientRemoteId")
+    })
+    private List<LikesBy> likesByList;
+
     public User(UserListRes.UserData userRes) {
 
         remoteId = userRes.getId();
@@ -224,7 +229,36 @@ public class User {
                 ", projects=" + projects +
                 ", bio='" + bio + '\'' +
                 ", repositories=" + repositories +
+                ", likesByList=" +likesByList +
                 '}';
+    }
+
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    @Generated(hash = 1988090925)
+    public synchronized void resetLikesByList() {
+        likesByList = null;
+    }
+
+    /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Generated(hash = 1143255429)
+    public List<LikesBy> getLikesByList() {
+        if (likesByList == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            LikesByDao targetDao = daoSession.getLikesByDao();
+            List<LikesBy> likesByListNew = targetDao._queryUser_LikesByList(remoteId);
+            synchronized (this) {
+                if(likesByList == null) {
+                    likesByList = likesByListNew;
+                }
+            }
+        }
+        return likesByList;
     }
 
     @Generated(hash = 1023608416)

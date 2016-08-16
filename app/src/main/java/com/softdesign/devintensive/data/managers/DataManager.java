@@ -8,6 +8,7 @@ import com.softdesign.devintensive.data.network.PicassoCache;
 import com.softdesign.devintensive.data.network.RestService;
 import com.softdesign.devintensive.data.network.ServiceGenerator;
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
+import com.softdesign.devintensive.data.network.res.UserLikesRes;
 import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
 import com.softdesign.devintensive.data.storage.models.DaoSession;
@@ -109,6 +110,22 @@ public class DataManager {
     public Call<UserListRes> getUserListFromNetwork() {
         return mRestService.getUserList();
     }
+
+
+    /**
+     * rest api like request
+     *
+     * @return
+     */
+    public Call<UserLikesRes> like(String recipientUserId,boolean isChecked) {
+        if(isChecked){
+            return mRestService.like(recipientUserId);
+        }else{
+            return mRestService.unLike(recipientUserId);
+        }
+    }
+
+
 
     // region database
 

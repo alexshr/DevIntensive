@@ -86,6 +86,10 @@ public class UserModelRes {
         @Expose
         private String updated;
 
+        @SerializedName("likesBy")
+        @Expose
+        private String[] likesBy;
+
         public int getProjects() {
             return projects;
         }
@@ -96,6 +100,10 @@ public class UserModelRes {
 
         public int getRating() {
             return rait;
+        }
+
+        public String[] getLikesBy() {
+            return likesBy;
         }
     }
 

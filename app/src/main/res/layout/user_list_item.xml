@@ -2,9 +2,9 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:http="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:http="http://schemas.android.com/tools"
     android:layout_marginTop="@dimen/spacing_8"
     app:cardBackgroundColor="@color/white_card"
     app:cardCornerRadius="@dimen/card_corner_radius"
@@ -60,17 +60,58 @@
             android:layout_height="@dimen/line_size"
             android:layout_marginBottom="@dimen/user_list_item_divider_margin_b"
             android:layout_marginTop="@dimen/user_list_item_divider_margin_t"
-            android:background="@color/color_grey_light"/>
+            android:background="@color/color_grey_light"
+            android:layout_marginLeft="@dimen/user_list_item_bio_padding_h"
+            android:layout_marginRight="@dimen/user_list_item_bio_padding_h"/>
 
-        <Button
-            android:id="@+id/more_info_btn"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/user_list_item_button_padding_h"
-            android:paddingRight="@dimen/user_list_item_button_padding_h"
-            android:text="@string/show_details"
-            android:textColor="@color/color_accent"/>
+            android:gravity="center_vertical">
+
+            <Button
+                android:id="@+id/more_info_btn"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:paddingLeft="@dimen/user_list_item_button_padding_h"
+                android:paddingRight="@dimen/user_list_item_button_padding_h"
+                android:text="@string/show_details"
+                android:textColor="@color/color_accent"/>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingRight="@dimen/user_list_item_button_padding_h">
+
+                <TextView
+                    android:id="@+id/likes_by_count_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="5"
+                    android:textSize="12sp"
+                    android:textColor="@color/color_grey_light"
+                    android:textAppearance="@style/user_rating_caption_textAppearance"
+                    />
+
+                <com.softdesign.devintensive.ui.views.ToggleImageButton
+                    android:id="@+id/likes_by_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:background="@android:color/white"
+
+                    android:src="@drawable/like_btn_sel"/>
+
+
+            </LinearLayout>
+
+        </RelativeLayout>
 
     </LinearLayout>
 

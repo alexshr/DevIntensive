@@ -1,6 +1,7 @@
 package com.softdesign.devintensive.data.network;
 
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
+import com.softdesign.devintensive.data.network.res.UserLikesRes;
 import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
 
@@ -12,6 +13,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 import retrofit2.http.Url;
 
 /**
@@ -32,4 +34,14 @@ public interface RestService {
     @GET("user/list?orderBy=rating")
     Call<UserListRes> getUserList();
 
+    @POST("user/{userId}/like")
+    Call<UserLikesRes> like( @Path("userId") String userId);
+
+    @POST("user/{userId}/unlike")
+    Call<UserLikesRes> unLike(@Path("userId") String userId);
+    /*
+    void getSomething(
+            @Path("userId") String userId
+    );
+*/
 }

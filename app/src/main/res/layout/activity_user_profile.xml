@@ -48,7 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_behavior=".ui.behaviors.CustomScrollingBehavior"            >
+        app:layout_behavior=".ui.behaviors.CustomScrollingBehavior">
 
         <include layout="@layout/user_ratings"/>
 
@@ -64,5 +64,13 @@
         </android.support.v4.widget.NestedScrollView>
     </LinearLayout>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/fab_right_space"
+        android:src="@drawable/ic_mode_edit_black_24dp"
+        app:layout_anchor="@id/appbar_layout"
+        app:layout_anchorGravity="bottom|right"/>
 
 </android.support.design.widget.CoordinatorLayout>

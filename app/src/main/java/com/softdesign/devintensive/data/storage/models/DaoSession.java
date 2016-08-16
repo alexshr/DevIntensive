@@ -8,10 +8,12 @@ import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.identityscope.IdentityScopeType;
 import org.greenrobot.greendao.internal.DaoConfig;
 
+import com.softdesign.devintensive.data.storage.models.LikesBy;
 import com.softdesign.devintensive.data.storage.models.Repository;
 import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.data.storage.models.UserOrder;
 
+import com.softdesign.devintensive.data.storage.models.LikesByDao;
 import com.softdesign.devintensive.data.storage.models.RepositoryDao;
 import com.softdesign.devintensive.data.storage.models.UserDao;
 import com.softdesign.devintensive.data.storage.models.UserOrderDao;
@@ -25,10 +27,12 @@ import com.softdesign.devintensive.data.storage.models.UserOrderDao;
  */
 public class DaoSession extends AbstractDaoSession {
 
+    private final DaoConfig likesByDaoConfig;
     private final DaoConfig repositoryDaoConfig;
     private final DaoConfig userDaoConfig;
     private final DaoConfig userOrderDaoConfig;
 
+    private final LikesByDao likesByDao;
     private final RepositoryDao repositoryDao;
     private final UserDao userDao;
     private final UserOrderDao userOrderDao;
@@ -36,6 +40,9 @@ public class DaoSession extends AbstractDaoSession {
     public DaoSession(Database db, IdentityScopeType type, Map<Class<? extends AbstractDao<?, ?>>, DaoConfig>
             daoConfigMap) {
         super(db);
+
+        likesByDaoConfig = daoConfigMap.get(LikesByDao.class).clone();
+        likesByDaoConfig.initIdentityScope(type);
 
         repositoryDaoConfig = daoConfigMap.get(RepositoryDao.class).clone();
         repositoryDaoConfig.initIdentityScope(type);
@@ -46,19 +53,26 @@ public class DaoSession extends AbstractDaoSession {
         userOrderDaoConfig = daoConfigMap.get(UserOrderDao.class).clone();
         userOrderDaoConfig.initIdentityScope(type);
 
+        likesByDao = new LikesByDao(likesByDaoConfig, this);
         repositoryDao = new RepositoryDao(repositoryDaoConfig, this);
         userDao = new UserDao(userDaoConfig, this);
         userOrderDao = new UserOrderDao(userOrderDaoConfig, this);
 
+        registerDao(LikesBy.class, likesByDao);
         registerDao(Repository.class, repositoryDao);
         registerDao(User.class, userDao);
         registerDao(UserOrder.class, userOrderDao);
     }
     
     public void clear() {
+        likesByDaoConfig.getIdentityScope().clear();
         repositoryDaoConfig.getIdentityScope().clear();
         userDaoConfig.getIdentityScope().clear();
         userOrderDaoConfig.getIdentityScope().clear();
+    }
+
+    public LikesByDao getLikesByDao() {
+        return likesByDao;
     }
 
     public RepositoryDao getRepositoryDao() {

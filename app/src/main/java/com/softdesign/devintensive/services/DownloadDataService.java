@@ -1,15 +1,18 @@
 package com.softdesign.devintensive.services;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.managers.PreferencesManager;
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
+import com.softdesign.devintensive.data.network.res.UserLikesRes;
 import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
+import com.softdesign.devintensive.data.storage.models.LikesBy;
+import com.softdesign.devintensive.data.storage.models.LikesByDao;
 import com.softdesign.devintensive.data.storage.models.Repository;
 import com.softdesign.devintensive.data.storage.models.RepositoryDao;
 import com.softdesign.devintensive.data.storage.models.User;
@@ -42,12 +45,17 @@ public class DownloadDataService extends IntentService {
 
     private static final String ACTION_USER_LIST = "USER_LIST";
     private static final String ACTION_TOKEN_AND_PROFILE = "TOKEN_AND_PROFILE";
+    private static final String ACTION_LIKE = "LIKE";
+
+    private static final String PARAM_USER_ID = "PARAM_USER_ID";
+    private static final String PARAM_IS_LIKE = "PARAM_IS_LIKE";
 
     private static final String PARAM_LOGIN = "LOGIN";
     private static final String PARAM_PASS = "PAS";
 
     private DataManager mDataManager = DataManager.getInstance();
     private RepositoryDao mRepositoryDao = mDataManager.getDaoSession().getRepositoryDao();
+    private LikesByDao mLikesByDao = mDataManager.getDaoSession().getLikesByDao();
     private UserDao mUserDao = mDataManager.getDaoSession().getUserDao();
     private PreferencesManager mPrefManager = mDataManager.getPreferencesManager();
 
@@ -97,6 +105,14 @@ public class DownloadDataService extends IntentService {
         context.startService(intent);
     }
 
+    public static void startActionLike(Context context, String userId, boolean isLike) {
+        Intent intent = new Intent(context, DownloadDataService.class);
+        intent.setAction(ACTION_LIKE);
+        intent.putExtra(PARAM_USER_ID, userId);
+        intent.putExtra(PARAM_IS_LIKE, isLike);
+        context.startService(intent);
+    }
+
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -105,26 +121,41 @@ public class DownloadDataService extends IntentService {
             String login = intent.getStringExtra(PARAM_LOGIN);
             String pass = intent.getStringExtra(PARAM_PASS);
 
-            if (ACTION_TOKEN_AND_PROFILE.equals(action)) {
-                //идем за токеном и профилем
-                if (loadTokenAndProfile(login, pass)) {
-                    EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_AUTHORIZATED));
-                    EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_DOWNLOAD_FINISHED));
-                }
-            } else if (ACTION_USER_LIST.equals(action)) {
-                if (login == null) {
-                    //пароль не прислали - значит сразу идем за списком
-                    if (loadUserListFromServerAndSaveInDb()) {
+            if (checkNetwork()) {
+
+                if (ACTION_TOKEN_AND_PROFILE.equals(action)) {
+                    //идем за токеном и профилем
+
+                    if (loadTokenAndProfile(login, pass)) {
                         EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_AUTHORIZATED));
                         EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_DOWNLOAD_FINISHED));
                     }
-                } else {
-                    //прислали пароль - сначала авторизуемся
-                    if (loadTokenAndProfile(login, pass)) {
-                        EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_AUTHORIZATED));
+
+                } else if (ACTION_USER_LIST.equals(action)) {
+                    if (login == null) {
+                        //пароль не прислали - значит сразу идем за списком
                         if (loadUserListFromServerAndSaveInDb()) {
+                            EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_AUTHORIZATED));
                             EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_DOWNLOAD_FINISHED));
                         }
+                    } else {
+                        //прислали пароль - сначала авторизуемся
+                        if (loadTokenAndProfile(login, pass)) {
+                            EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_AUTHORIZATED));
+                            if (loadUserListFromServerAndSaveInDb()) {
+                                EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_DOWNLOAD_FINISHED));
+                            }
+                        }
+                    }
+                } else if (ACTION_LIKE.equals(action)) {
+                    String userId = intent.getStringExtra(PARAM_USER_ID);
+                    boolean isLike = intent.getBooleanExtra(PARAM_IS_LIKE, true);
+                    if (likeToServer(userId, isLike)) {
+                        //если получилось - сразу пишем в базу
+                        likeToDb(userId, isLike);
+                    } else {
+                        //TODO отменить результат в ui
+                        Log.e(LOG_TAG, "!!operation fails: likeToDb recId=" + userId + " isChecked=" + isLike);
                     }
                 }
             }
@@ -132,12 +163,57 @@ public class DownloadDataService extends IntentService {
     }
 
 
-    private boolean loadTokenAndProfile(String login, String pass) {
+    private void likeToDb(String recipientId, boolean isChecked) {
+        LikesBy likesBy = new LikesBy(mPrefManager.getUserId(), recipientId);
+try {
+    if (isChecked) {
+        mLikesByDao.insertOrReplace(likesBy);
+        Log.e(LOG_TAG, "inserting: " + likesBy);
+    } else {
+        mLikesByDao.delete(likesBy);
+        Log.e(LOG_TAG, "deleting: " + likesBy);
+    }
+}catch (Exception e){
+    Log.e(LOG_TAG,",e");
+}
+}
 
-        if (!NetworkStatusChecker.isNetworkAvailable(this)) {
-            EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_NETWORK_NOT_AVAILABLE));
+
+    private boolean likeToServer(String userId, boolean isChecked) {
+
+        Call<UserLikesRes> call = mDataManager.like(userId, isChecked);
+        try {
+            Response<UserLikesRes> response = call.execute();
+            if (response.code() == 200) {
+
+                boolean isSuccess = !isChecked;
+                for (String senderId : response.body().getData().getLikesBy()) {
+                    if (senderId .equals(mPrefManager.getUserId())) {
+                        isSuccess = !isSuccess;
+                        break;
+                    }
+                }
+                Log.d(LOG_TAG, "likeToServer senderId=" + mPrefManager.getUserId()
+                        + " recId=" + userId + " isChecked=" + isChecked + " isSuccess=" + isSuccess);
+
+                return isSuccess;
+
+            } else if (response.code() == 401) {
+                EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_USER_NOT_AUTHORIZED));
+                return false;
+            } else {
+                Log.e(LOG_TAG, "Network error: " + response.message());
+                EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_RESPONSE_ERROR));
+                return false;
+            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Network failure: ", e);
+            EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_SERVER_ERROR));
             return false;
         }
+    }
+
+    private boolean loadTokenAndProfile(String login, String pass) {
 
 
         Call<UserModelRes> call = mDataManager.loginUser(
@@ -174,31 +250,31 @@ public class DownloadDataService extends IntentService {
      */
     private boolean loadUserListFromServerAndSaveInDb() {
 
-
-        if (!NetworkStatusChecker.isNetworkAvailable(this)) {
-            EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_NETWORK_NOT_AVAILABLE));
-            return false;
-        }
-
         Call<UserListRes> call = mDataManager.getUserListFromNetwork();
         try {
             Response<UserListRes> response = call.execute();
             if (response.code() == 200) {
 
                 List<Repository> allRepositories = new ArrayList<>();
+                List<LikesBy> allLikesBy = new ArrayList<>();
                 List<User> allUsers = new ArrayList<>();
 
                 for (UserListRes.UserData userRes : response.body().getData()) {
                     allRepositories.addAll(getRepoListFromUserRes(userRes));
+                    allLikesBy.addAll(getLikesByListFromUserRes(userRes));
+
                     User user = new User(userRes);
                     allUsers.add(user);
 
                 }
 
-                mRepositoryDao.insertOrReplaceInTx(allRepositories);//вставляем пакетом!
-
                 mUserDao.insertOrReplaceInTx(allUsers);
-                Log.d(LOG_TAG, "loadUserListFromServerAndSaveInDb result size=" + allUsers.size());
+                mRepositoryDao.insertOrReplaceInTx(allRepositories);
+                mLikesByDao.insertOrReplaceInTx(allLikesBy);
+
+
+                Log.d(LOG_TAG, "loadUserListFromServerAndSaveInDb users size=" + allUsers.size()
+                        + " repos size=" + allRepositories.size() + " likesBy size=" + allLikesBy.size());
 
                 return true;
 
@@ -234,6 +310,21 @@ public class DownloadDataService extends IntentService {
         return repositories;
     }
 
+
+    private List<LikesBy> getLikesByListFromUserRes(UserListRes.UserData userData) {
+        final String recipientId = userData.getId();
+
+        List<LikesBy> likesByList = new ArrayList<>();
+        //Log.d(LOG_TAG, "getLikesByListFromUserRes called for user=" + userData.getId());
+        for (String senderId : userData.getProfileValues().getLikesBy()) {
+            LikesBy likesBy = new LikesBy(senderId, recipientId);
+            Log.d(LOG_TAG, "getLikesByListFromUserRes: " + likesBy);
+            likesByList.add(likesBy);
+
+        }
+        return likesByList;
+    }
+
     /**
      * кладем токен и данные профиля в Preferences
      *
@@ -241,6 +332,7 @@ public class DownloadDataService extends IntentService {
      * @param login
      * @param pass
      */
+
     private void saveTokenAndProfile(UserModelRes userModel, String login, String pass) {
 
         Log.d(LOG_TAG, "saveTokenAndProfile started");
@@ -278,6 +370,15 @@ public class DownloadDataService extends IntentService {
         mPrefManager.savePhotoUri(userModel.getData().getUser().getPublicInfo().getPhoto());
         mPrefManager.saveAvatarUri(userModel.getData().getUser().getPublicInfo().getAvatar());
 
+    }
+
+    private boolean checkNetwork() {
+        if (!NetworkStatusChecker.isNetworkAvailable(this)) {
+            EventBus.getDefault().post(new MessageEvent(BaseManagerActivity.MES_NETWORK_NOT_AVAILABLE));
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

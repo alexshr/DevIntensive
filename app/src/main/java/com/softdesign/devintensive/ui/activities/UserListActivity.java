@@ -33,6 +33,7 @@ import com.softdesign.devintensive.data.storage.tasks.LoadUserListFromDbTask;
 import com.softdesign.devintensive.data.storage.tasks.SaveUserOrdersInDbTask;
 import com.softdesign.devintensive.services.DownloadDataService;
 import com.softdesign.devintensive.ui.adapters.UserListAdapter;
+import com.softdesign.devintensive.ui.views.ToggleImageButton;
 import com.softdesign.devintensive.utils.BorderedCircleTransform;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.Utils;
@@ -380,14 +381,24 @@ public class UserListActivity extends BaseManagerActivity {
             setUserList(users);
             mUserListAdapter = new UserListAdapter(users, new UserListAdapter.UserViewHolder.UserItemClickListener() {
                 @Override
-                public void onUserItemClick(int adapterPosition) {
+                public void onUserItemClick(int adapterPosition, View view) {
+                    User user = mUserListAdapter.getUser(adapterPosition);
 
-                    UserDTO userDTO = new UserDTO(mUserListAdapter.getUser(adapterPosition));
-                    Intent intent = new Intent(UserListActivity.this, ProfileUserActivity.class);
-                    intent.putExtra(ConstantManager.USER_DTO_KEY, userDTO);
+                    switch (view.getId()) {
+                        case R.id.more_info_btn:
 
-                    startActivity(intent);
+                            Intent intent = new Intent(UserListActivity.this, ProfileUserActivity.class);
+                            intent.putExtra(ConstantManager.USER_DTO_KEY, new UserDTO(user));
 
+                            startActivity(intent);
+                            break;
+                        case R.id.likes_by_btn: {
+                            ToggleImageButton btn = (ToggleImageButton) findViewById(R.id.likes_by_btn);
+                            //btn.setChecked(!btn.isChecked());
+                            DownloadDataService.startActionLike(UserListActivity.this, user.getRemoteId(), btn.isChecked());
+                        }
+
+                    }
                 }
             });
 

@@ -44,8 +44,15 @@ public class ProfileUserActivity extends AppCompatActivity {
     CollapsingToolbarLayout mCollapsingToolbar;
     @BindView(R.id.main_coordinator_container)
     CoordinatorLayout mCoordinatorLayout;
-    @BindView(R.id.repositories_list) ListView mRepoListView;
+    @BindView(R.id.repositories_list)
+    ListView mRepoListView;
+/*
+    @BindView(R.id.likes_by_btn)
+    ToggleImageButton mLikesByBtn;
 
+    @BindView(R.id.likes_by_count_txt)
+    TextView mLikesByCount;
+*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,5 +106,8 @@ public class ProfileUserActivity extends AppCompatActivity {
                 .placeholder(R.drawable.user_bg)
                 .error(R.drawable.user_bg)
                 .into(mProfileImage);
+
+       // mLikesByBtn.setChecked(userDTO.isMyFavorite());
+       // mLikesByCount.setText(userDTO.getLikesByCount());
     }
 }
